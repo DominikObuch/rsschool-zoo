@@ -1,0 +1,75 @@
+@use 'variables' as *;
+
+// ─── Map Pin Marker ───────────────────────────────────────────────────────────
+// DOM structure (built in map page JS):
+//   <button class="map-pin" data-animal="lion">
+//     <span class="map-pin__body"></span>
+//     <img  class="map-pin__icon" src="..." alt="Lion">
+//   </button>
+//
+// The teardrop is a pure-CSS shape:
+// border-radius gives the oval, ::after arrow creates the pointed tail.
+.map-pin {
+  position:        relative;
+  display:         inline-flex;
+  align-items:     flex-start;
+  justify-content: center;
+  width:           52px;
+  height:          64px;
+  padding:         0;
+  border:          none;
+  background:      transparent;
+  cursor:          pointer;
+  transition:      transform $transition-base;
+
+  &:hover {
+    transform: scale(1.08);
+  }
+
+  // ── Teardrop body ──────────────────────────────────────────────────────────
+  &__body {
+    position:         absolute;
+    inset:            0;
+    border-radius:    50% 50% 50% 50% / 40% 40% 55% 55%;
+    background-color: $color-white;
+    box-shadow:       0 0 16px 4px rgba($color-white, 0.5);
+    transition:       background-color $transition-base,
+                      box-shadow       $transition-base;
+
+    // Pointed tail
+    &::after {
+      content:      '';
+      position:     absolute;
+      bottom:       -14px;
+      left:         50%;
+      transform:    translateX(-50%);
+      width:        0;
+      height:       0;
+      border-left:  13px solid transparent;
+      border-right: 13px solid transparent;
+      border-top:   16px solid $color-white;
+      transition:   border-top-color $transition-base;
+    }
+  }
+
+  // ── Animal icon ────────────────────────────────────────────────────────────
+  &__icon {
+    position:    relative;
+    z-index:     1;
+    width:       28px;
+    height:      28px;
+    margin-top:  10px;
+    object-fit:  contain;
+  }
+
+  // ── Active / hover state ───────────────────────────────────────────────────
+  &--active &__body,
+  &:hover   &__body {
+    background-color: $color-orange;
+    box-shadow:       0 0 16px 4px rgba($color-orange, 0.45);
+
+    &::after {
+      border-top-color: $color-orange;
+    }
+  }
+}

@@ -1,0 +1,126 @@
+@use 'variables' as *;
+
+// ─── Base ─────────────────────────────────────────────────────────────────────
+.btn {
+  display:         inline-flex;
+  align-items:     center;
+  gap:             0.5em;
+  cursor:          pointer;
+  font-family:     $font-family-base;
+  font-size:       $btn-font-size;
+  font-weight:     $font-weight-bold;
+  letter-spacing:  $btn-letter-spacing;
+  text-transform:  uppercase;
+  text-decoration: none;
+  border:          none;
+  border-radius:   $btn-border-radius;
+  padding:         $btn-padding-v $btn-padding-h;
+  transition:
+    background-color $transition-base,
+    color            $transition-base,
+    border-color     $transition-base;
+
+  &::after {
+    content: '→';
+    font-style: normal;
+  }
+}
+
+// ─── Filled: Turquoise ────────────────────────────────────────────────────────
+.btn--turquoise {
+  background-color: $color-turquoise;
+  color:            $color-white;
+
+  &:hover {
+    background-color: $color-turquoise-dark;
+  }
+}
+
+// ─── Filled: Orange ───────────────────────────────────────────────────────────
+.btn--orange {
+  background-color: $color-orange;
+  color:            $color-white;
+
+  &:hover {
+    background-color: $color-orange-dark;
+  }
+}
+
+// ─── Filled: Navy ─────────────────────────────────────────────────────────────
+.btn--navy {
+  background-color: $color-navy;
+  color:            $color-white;
+
+  &:hover {
+    background-color: $color-navy-dark;
+  }
+}
+
+// ─── Outline: Navy border, white bg ──────────────────────────────────────────
+.btn--outline {
+  background-color: $color-white;
+  color:            $color-navy;
+  border:           1.5px solid $color-navy;
+
+  &:hover {
+    background-color: $color-navy;
+    color:            $color-white;
+  }
+}
+
+// ─── Text: No box, orange label + arrow ──────────────────────────────────────
+.btn--text {
+  background-color: transparent;
+  color:            $color-orange;
+  border:           none;
+  border-radius:    0;
+  padding:          0;
+
+  &:hover {
+    color: $color-orange-dark;
+  }
+}
+
+// ─── Arrow: Standalone → glyph, no label, no box ─────────────────────────────
+// textContent is '→' — ::after not used here, suppress it
+.btn--arrow {
+  background-color: transparent;
+  color:            $color-navy;
+  border:           none;
+  border-radius:    0;
+  padding:          0;
+  font-size:        1.25rem;
+  line-height:      1;
+
+  &::after {
+    content: none; // arrow IS the text content — no ::after duplicate
+  }
+
+  &:hover {
+    color: $color-orange;
+  }
+}
+
+// ─── Nav: Square ←/→ slider controls ─────────────────────────────────────────
+// textContent is '←' or '→' — no ::after
+.btn--nav {
+  width:            $btn-icon-size;
+  height:           $btn-icon-size;
+  justify-content:  center;
+  background-color: $color-white;
+  color:            $color-navy;
+  border:           1.5px solid $color-navy;
+  border-radius:    4px;
+  padding:          0;
+  font-size:        1.2rem;
+
+  &::after {
+    content: none;
+  }
+
+  &:hover,
+  &--active {
+    background-color: $color-navy;
+    color:            $color-white;
+  }
+}
