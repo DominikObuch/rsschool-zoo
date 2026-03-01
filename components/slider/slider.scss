@@ -1,0 +1,59 @@
+@use '../../src/styles/variables' as *;
+
+:host {
+  display: block;
+}
+
+.slider {
+  display: flex;
+  flex-direction: column;
+
+  &__controls {
+    display:        flex;
+    gap:            8px;
+    justify-content: center;
+    margin-bottom:  32px;
+  }
+
+  &__btn {
+    display:         flex;
+    align-items:     center;
+    justify-content: center;
+    width:           44px;
+    height:          44px;
+    border:          2px solid var(--slider-btn-color, #{$color-black});
+    background:      transparent;
+    border-radius:   4px;
+    cursor:          pointer;
+    padding:         0;
+    transition:      background-color $transition-base, border-color $transition-base;
+
+    &::after {
+      @include arrow-svg(16px, 14px);
+      background-color: var(--slider-btn-color, #{$color-black});
+    }
+
+    &--prev::after {
+      transform: rotate(180deg);
+    }
+
+    &:hover:not(:disabled) {
+      background-color: var(--slider-btn-hover-bg, rgba(0, 0, 0, 0.06));
+    }
+
+    &:disabled {
+      opacity: 0.3;
+      cursor:  default;
+    }
+  }
+
+  &__grid {
+    display:               grid;
+    gap:                   24px;
+    grid-template-columns: repeat(var(--slider-cols, 4), 1fr);
+
+    slot {
+      display: contents;
+    }
+  }
+}

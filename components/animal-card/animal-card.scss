@@ -1,0 +1,100 @@
+@use '../../src/styles/variables' as *;
+
+.animal-card {
+  display: flex;
+  flex-direction: column;
+  text-decoration: none;
+  border-radius: 6px;
+  overflow: hidden;
+  background: $color-navy;
+  cursor: pointer;
+  transition: transform $transition-base;
+
+  &:hover {
+    transform: translateY(-4px);
+  }
+
+  &__image-wrap {
+    position: relative;
+    flex: 0 0 auto;
+    overflow: hidden;
+  }
+
+  &__image {
+    display: block;
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+  }
+
+  &__badge {
+    position: absolute;
+    top: 0;
+    left: 0;
+    background: $color-navy;
+    color: $color-white;
+    font-family: $font-family-base;
+    font-weight: $font-weight-regular;
+    font-size: 0.875rem;
+    line-height: 1;
+    padding: 8px 14px;
+  }
+
+  &__body {
+    padding: 20px 24px 28px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    flex: 1 1 auto;
+  }
+
+  &__species {
+    color: $color-white;
+    font-family: $font-family-base;
+    font-weight: $font-weight-bold;
+    font-size: 1.25rem;
+    line-height: 1.2;
+    text-align: center;
+    margin: 0;
+  }
+
+  &__description {
+    color: $color-white;
+    font-family: $font-family-base;
+    font-weight: $font-weight-regular;
+    font-size: 0.875rem;
+    line-height: 1.55;
+    text-align: center;
+    margin: 0;
+    flex: 1 1 auto;
+  }
+
+  &__cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: $color-orange;
+    font-family: $font-family-base;
+    font-weight: $font-weight-bold;
+    font-size: $btn-font-size;
+    letter-spacing: $btn-letter-spacing;
+    text-transform: uppercase;
+    transition: color $transition-base;
+    margin-top: auto;
+
+    &::after {
+      @include arrow-svg(16px, 14px);
+      background-color: $color-orange;
+      transition: background-color $transition-base;
+    }
+  }
+
+  &:hover &__cta {
+    color: $color-orange-dark;
+
+    &::after {
+      background-color: $color-orange-dark;
+    }
+  }
+}

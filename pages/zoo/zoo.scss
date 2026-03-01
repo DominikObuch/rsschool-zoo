@@ -1,1 +1,197 @@
 // Zoo page styles
+@use '../../src/styles/variables' as *;
+
+
+// ─── Pay & Feed ───────────────────────────────────────────────────────────────
+
+.pay-feed {
+  background-color: $color-navy;
+  padding: 80px 80px;
+
+  &__title {
+    font-family:    $font-family-base;
+    font-weight:    $font-weight-bold;
+    font-size:      3rem;
+    line-height:    1.1;
+    color:          $color-white;
+    text-transform: uppercase;
+    margin:         0 0 56px;
+  }
+
+  &__step {
+    margin-bottom: 64px;
+
+    &:last-of-type {
+      margin-bottom: 64px;
+    }
+  }
+
+  &__step-header {
+    display:       flex;
+    align-items:   center;
+    gap:           16px;
+    margin-bottom: 32px;
+  }
+
+  &__step-number {
+    font-family: $font-family-base;
+    font-weight: $font-weight-bold;
+    font-size:   1rem;
+    color:       $color-white;
+    flex-shrink: 0;
+  }
+
+  &__step-divider {
+    flex:       1 1 0;
+    border:     none;
+    border-top: 1px solid rgba($color-white, 0.3);
+    margin:     0;
+  }
+
+  &__step-body {
+    display:     flex;
+    align-items: flex-start;
+    gap:         60px;
+  }
+
+  &__step-image {
+    flex:          0 0 370px;
+    width:         370px;
+    height:        280px;
+    object-fit:    cover;
+    display:       block;
+    border-radius: 2px;
+  }
+
+  &__step-info {
+    flex:           1 1 0;
+    display:        flex;
+    flex-direction: column;
+    align-items:    center;
+    text-align:     center;
+  }
+
+  &__step-icon {
+    display:       block;
+    width:         72px;
+    height:        72px;
+    object-fit:    contain;
+    margin-bottom: 24px;
+    filter: brightness(0) saturate(100%) invert(55%) sepia(75%) saturate(420%) hue-rotate(135deg) brightness(90%) contrast(100%);
+  }
+
+  &__step-heading {
+    font-family:    $font-family-base;
+    font-weight:    $font-weight-bold;
+    font-size:      1.375rem;
+    line-height:    1.25;
+    color:          $color-white;
+    text-transform: none;
+    margin:         0 0 16px;
+  }
+
+  &__step-text {
+    font-family: $font-family-base;
+    font-weight: $font-weight-regular;
+    font-size:   0.875rem;
+    line-height: 1.7;
+    color:       $color-white;
+    margin:      0;
+  }
+
+  &__cta {
+    display:          flex;
+    align-items:      center;
+    justify-content:  center;
+    gap:              0.75rem;
+    margin:           0 auto;
+    background-color: $color-orange;
+    color:            $color-white;
+    font-family:      $font-family-base;
+    font-weight:      $font-weight-bold;
+    font-size:        $btn-font-size;
+    letter-spacing:   $btn-letter-spacing;
+    text-transform:   uppercase;
+    border:           none;
+    padding:          $btn-padding-v $btn-padding-h;
+    border-radius:    $btn-border-radius;
+    cursor:           pointer;
+    transition:       background-color $transition-base;
+
+    &::after {
+      @include arrow-svg(18px, 16px);
+    }
+
+    &:hover {
+      background-color: $color-orange-dark;
+    }
+  }
+
+  // ── 1200 px ─────────────────────────────────────────────────────────────────
+  @media (max-width: 1200px) {
+    padding: 64px 40px;
+
+    &__title {
+      font-size:     2.5rem;
+      margin-bottom: 48px;
+    }
+
+    &__step-body {
+      gap: 40px;
+    }
+
+    &__step-image {
+      flex:   0 0 300px;
+      width:  300px;
+      height: 240px;
+    }
+  }
+
+  // ── 640 px – stack image above info ─────────────────────────────────────────
+  @media (max-width: 640px) {
+    padding: 56px 40px;
+
+    &__title {
+      font-size:     2rem;
+      margin-bottom: 40px;
+    }
+
+    &__step-body {
+      flex-direction: column;
+      gap:            24px;
+    }
+
+    &__step-image {
+      flex:   none;
+      width:  100%;
+      height: 240px;
+    }
+
+    &__step-info {
+      align-items: center;
+      text-align:  center;
+    }
+
+    &__cta {
+      width: 100%;
+    }
+  }
+
+  // ── 320 px ─────────────────────────────────────────────────────────────────
+  @media (max-width: 320px) {
+    padding: 48px 16px;
+
+    &__title {
+      font-size: 1.75rem;
+    }
+
+    &__step-image {
+      height: 200px;
+    }
+
+    &__step-heading {
+      font-size: 1.125rem;
+    }
+  }
+}
+
