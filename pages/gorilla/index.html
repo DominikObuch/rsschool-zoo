@@ -7,28 +7,13 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet" />
-    <title>Online Zoo — Map</title>
+    <title>Online Zoo — Live Gorilla Cams</title>
     <script type="module" src="../../components/layout/layout.js"></script>
     <script type="module" src="./script.js"></script>
   </head>
   <body>
-    <h1 class="map__sr-only">Online Zoo</h1>
-    <zoo-layout active="map">
-
-      <!-- ─── Map ─────────────────────────────────────────────────────── -->
-      <section class="map">
-        <h2 class="map__title">find where are the animals live</h2>
-
-        <div class="map__container">
-          <img
-            class="map__image"
-            src="../../icons/map.svg"
-            alt="World map showing animal habitats"
-            draggable="false"
-          />
-        </div>
-      </section>
-
+    <zoo-layout active="zoo">
+      <animal-page slug="gorilla"></animal-page>
     </zoo-layout>
 
     <!-- Popups -->

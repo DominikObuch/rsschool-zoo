@@ -1,28 +1,31 @@
-// Zoo (animal) page styles — shared by panda / lemur / eagle / gorilla
+// Styles for <animal-page> Shadow DOM component
+// All three sections: .live-cams · .pay-feed · .did-you-know
 @use '../../src/styles/variables' as *;
 
-// ─── Sticky side-panel host element ──────────────────────────────────────────
-// live-cam-nav is a custom element; we size it from the page level so the
-// sticky positioning works inside the flex row.
+// ─── Host fills available width ───────────────────────────────────────────────
+:host {
+  display: block;
+  width: 100%;
+}
 
-// ─── Live Cams ───────────────────────────────────────────────────────────────
+// ─── Live Cams ────────────────────────────────────────────────────────────────
 
 .live-cams {
   display:     flex;
   align-items: stretch;
 
   live-cam-nav {
-    position:   sticky;
-    top:        0;
-    height:     100vh;
+    position:    sticky;
+    top:         0;
+    height:      100vh;
     flex-shrink: 0;
-    align-self: flex-start;
+    align-self:  flex-start;
   }
 
   &__content {
-    flex:       1 1 0;
-    min-width:  0;
-    padding:    32px 48px 48px;
+    flex:      1 1 0;
+    min-width: 0;
+    padding:   32px 48px 48px;
   }
 
   &__header {
@@ -69,7 +72,6 @@
     &:hover { background-color: $color-orange-dark; }
   }
 
-  // Main video area
   &__main {
     position:      relative;
     margin-bottom: 24px;
@@ -89,14 +91,13 @@
   }
 
   &__big {
-    display:       block;
-    width:         100%;
-    aspect-ratio:  16 / 9;
-    object-fit:    cover;
+    display:      block;
+    width:        100%;
+    aspect-ratio: 16 / 9;
+    object-fit:   cover;
     border-radius: 2px;
   }
 
-  // "More live views" label
   &__more-label {
     font-family:    $font-family-base;
     font-weight:    $font-weight-bold;
@@ -107,7 +108,6 @@
     margin:         0 0 16px;
   }
 
-  // Carousel
   &__carousel {
     display:     flex;
     align-items: center;
@@ -130,9 +130,9 @@
   }
 
   &__thumbs {
-    display: flex;
-    gap:     12px;
-    flex:    1 1 0;
+    display:   flex;
+    gap:       12px;
+    flex:      1 1 0;
     min-width: 0;
   }
 
@@ -147,17 +147,15 @@
     transition:    border-color $transition-base;
 
     img {
-      display:    block;
-      width:      100%;
+      display:      block;
+      width:        100%;
       aspect-ratio: 4 / 3;
-      object-fit: cover;
+      object-fit:   cover;
     }
 
     &:hover { border-color: rgba($color-orange, 0.6); }
 
-    &--active {
-      border-color: $color-orange;
-    }
+    &--active { border-color: $color-orange; }
   }
 
   &__thumb-label {
@@ -175,16 +173,9 @@
     z-index:          1;
   }
 
-  // ── 1200 px ─────────────────────────────────────────────────────────────────
-  @media (max-width: 1200px) {
-    &__content { padding: 24px 32px 40px; }
-
-    &__title { font-size: 2.25rem; }
-  }
-
-  // ── Mobile full-width donate CTA (below carousel, hidden at desktop) ──────
+  // ── Mobile full-width donate CTA ───────────────────────────────────────────
   &__donate-cta {
-    display:          none; // shown only at ≤ 640px
+    display:          none;
     width:            100%;
     justify-content:  center;
     align-items:      center;
@@ -209,19 +200,25 @@
     &:hover { background-color: $color-orange-dark; }
   }
 
+  // ── 1200 px ─────────────────────────────────────────────────────────────────
+  @media (max-width: 1200px) {
+    &__content { padding: 24px 32px 40px; }
+    &__title   { font-size: 2.25rem; }
+  }
+
   // ── 640 px ──────────────────────────────────────────────────────────────────
   @media (max-width: 640px) {
     &__content { padding: 16px 12px 32px; }
 
     &__header {
-      flex-wrap:    wrap;
+      flex-wrap:     wrap;
       margin-bottom: 16px;
     }
 
     &__title { font-size: 1.5rem; }
 
     &__donate {
-      padding: $btn-padding-v-sm $btn-padding-h-sm;
+      padding:   $btn-padding-v-sm $btn-padding-h-sm;
       font-size: 0.75rem;
     }
 
@@ -240,15 +237,13 @@
   // ── 320 px ──────────────────────────────────────────────────────────────────
   @media (max-width: 320px) {
     &__content { padding: 12px 8px 24px; }
-
-    &__title { font-size: 1.125rem; }
-
-    &__donate { display: none; } // too narrow — donate reachable via sticky nav
+    &__title   { font-size: 1.125rem; }
+    &__donate  { display: none; }
   }
 }
 
 
-// ─── Pay & Feed (zoo simple variant) ─────────────────────────────────────────
+// ─── Pay & Feed ───────────────────────────────────────────────────────────────
 
 .pay-feed {
   background-color: $color-white;
@@ -258,7 +253,7 @@
   padding:          56px 80px;
 
   &__text {
-    flex: 1 1 0;
+    flex:      1 1 0;
     min-width: 0;
   }
 
@@ -287,13 +282,13 @@
   }
 
   &__quick-label {
-    font-family:  $font-family-base;
-    font-weight:  $font-weight-bold;
-    font-size:    0.875rem;
-    color:        $color-navy;
+    font-family:    $font-family-base;
+    font-weight:    $font-weight-bold;
+    font-size:      0.875rem;
+    color:          $color-navy;
     text-transform: uppercase;
     letter-spacing: 0.06em;
-    margin:       0 0 10px;
+    margin:         0 0 10px;
   }
 
   &__input-row {
@@ -301,8 +296,7 @@
     align-items: stretch;
     gap:         0;
 
-    zoo-input { flex: 1 1 0; }
-
+    zoo-input  { flex: 1 1 0; }
     amount-btn { flex-shrink: 0; }
   }
 
@@ -314,21 +308,19 @@
     &__quick-donate { flex: 0 0 220px; }
   }
 
-  // ── 640 px ─── stack vertically ─────────────────────────────────────────────
+  // ── 640 px ──────────────────────────────────────────────────────────────────
   @media (max-width: 640px) {
     flex-direction: column;
     padding:        40px 16px;
     gap:            24px;
 
-    &__title { font-size: 1.625rem; }
-
+    &__title        { font-size: 1.625rem; }
     &__quick-donate { flex: none; width: 100%; }
   }
 
   // ── 320 px ──────────────────────────────────────────────────────────────────
   @media (max-width: 320px) {
-    padding: 40px 16px;
-
+    padding:  40px 16px;
     &__title { font-size: 1.375rem; }
   }
 }
@@ -339,7 +331,6 @@
 .did-you-know {
   padding: 64px 80px;
 
-  // Fact card
   &__card {
     max-width:     680px;
     margin:        0 auto 56px;
@@ -367,13 +358,12 @@
     margin:      0;
   }
 
-  // Profile row — info + photo side by side
   &__profile {
-    display:         flex;
-    align-items:     flex-start;
-    gap:             48px;
-    margin-bottom:   48px;
-    max-width:       900px;
+    display:       flex;
+    align-items:   flex-start;
+    gap:           48px;
+    margin-bottom: 48px;
+    max-width:     900px;
   }
 
   &__info {
@@ -406,16 +396,16 @@
   }
 
   &__map-link {
-    color:          $color-orange;
-    text-transform: uppercase;
-    font-weight:    $font-weight-bold;
-    font-size:      0.875rem;
+    color:           $color-orange;
+    text-transform:  uppercase;
+    font-weight:     $font-weight-bold;
+    font-size:       0.875rem;
     text-decoration: none;
-    display:        inline-flex;
-    align-items:    center;
-    gap:            6px;
-    cursor:         pointer;
-    transition:     opacity $transition-base;
+    display:         inline-flex;
+    align-items:     center;
+    gap:             6px;
+    cursor:          pointer;
+    transition:      opacity $transition-base;
 
     &::after {
       @include arrow-svg(14px, 12px);
@@ -436,7 +426,6 @@
     display:       block;
   }
 
-  // Long description
   &__description {
     font-family: $font-family-base;
     font-weight: $font-weight-regular;
@@ -460,7 +449,7 @@
     }
   }
 
-  // ── 640 px ─── stack profile vertically ─────────────────────────────────────
+  // ── 640 px ──────────────────────────────────────────────────────────────────
   @media (max-width: 640px) {
     padding: 48px 24px;
 

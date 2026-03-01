@@ -2,17 +2,17 @@ import styles from './header.scss?inline';
 
 // ─── Nav items ────────────────────────────────────────────────────────────────
 const NAV_ITEMS = [
-  { label: 'About',      page: 'landing', href: '/pages/landing/' },
-  { label: 'Map',        page: 'map',     href: '/pages/map/' },
-  { label: 'Zoos',       page: 'zoo',     href: '/pages/zoo/' },
-  { label: 'Contact Us', page: 'contact', href: '/pages/contact/' },
+  { label: 'About',      page: 'landing', href: '../../pages/landing/' },
+  { label: 'Map',        page: 'map',     href: '../../pages/map/' },
+  { label: 'Zoos',       page: 'zoo',     href: '../../pages/zoo/' },
+  { label: 'Contact Us', page: 'contact', href: '../../pages/contact/' },
   { label: 'Design',     page: 'design',  href: 'https://www.figma.com/', target: '_blank' },
 ];
 
 const SOCIAL_ITEMS = [
-  { label: 'YouTube',   icon: '/icons/YouTube.svg',   href: 'https://www.youtube.com/' },
-  { label: 'Instagram', icon: '/icons/Instagram.svg', href: 'https://www.instagram.com/' },
-  { label: 'Facebook',  icon: '/icons/Facebook.svg',  href: 'https://www.facebook.com/' },
+  { label: 'YouTube',   icon: '../../icons/YouTube.svg',   href: 'https://www.youtube.com/' },
+  { label: 'Instagram', icon: '../../icons/Instagram.svg', href: 'https://www.instagram.com/' },
+  { label: 'Facebook',  icon: '../../icons/Facebook.svg',  href: 'https://www.facebook.com/' },
 ];
 
 // ─── Template ─────────────────────────────────────────────────────────────────
@@ -30,12 +30,12 @@ function buildTemplate() {
   // Logo
   const logoLink = document.createElement('a');
   logoLink.className = 'header__logo-link';
-  logoLink.href = '/';
+  logoLink.href = '../../pages/landing/index.html';
   logoLink.setAttribute('aria-label', 'Online Zoo — home');
 
   const logoImg = document.createElement('img');
   logoImg.className = 'header__logo';
-  logoImg.src = '/icons/Logo.svg';
+  logoImg.src = '../../icons/Logo.svg';
   logoImg.alt = 'Online Zoo';
   logoImg.width = 96;
   logoImg.height = 50;

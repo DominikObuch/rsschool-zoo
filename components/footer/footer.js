@@ -2,16 +2,16 @@ import styles from './footer.scss?inline';
 
 // ─── Data ─────────────────────────────────────────────────────────────────────
 const NAV_ITEMS = [
-  { label: 'About',      page: 'landing', href: '/pages/landing/' },
-  { label: 'Map',        page: 'map',     href: '/pages/map/' },
-  { label: 'Zoos',       page: 'zoo',     href: '/pages/zoo/' },
-  { label: 'Contact Us', page: 'contact', href: '/pages/contact/' },
+  { label: 'About',      page: 'landing', href: '../../pages/landing/' },
+  { label: 'Map',        page: 'map',     href: '../../pages/map/' },
+  { label: 'Zoos',       page: 'zoo',     href: '../../pages/zoo/' },
+  { label: 'Contact Us', page: 'contact', href: '../../pages/contact/' },
 ];
 
 const SOCIAL_ITEMS = [
-  { label: 'YouTube',   icon: '/icons/YouTube.svg',   href: 'https://www.youtube.com/' },
-  { label: 'Instagram', icon: '/icons/Instagram.svg', href: 'https://www.instagram.com/' },
-  { label: 'Facebook',  icon: '/icons/Facebook.svg',  href: 'https://www.facebook.com/' },
+  { label: 'YouTube',   icon: '../../icons/YouTube.svg',   href: 'https://www.youtube.com/' },
+  { label: 'Instagram', icon: '../../icons/Instagram.svg', href: 'https://www.instagram.com/' },
+  { label: 'Facebook',  icon: '../../icons/Facebook.svg',  href: 'https://www.facebook.com/' },
 ];
 
 const CREDIT_ITEMS = ['© 2021 DinaK', '© Yem Digital', '© RSSchool'];
@@ -35,9 +35,9 @@ function buildTemplate() {
   logos.className = 'footer__logos';
 
   const logoData = [
-    { src: '/icons/LogoFooter.svg',              alt: 'Online Zoo',  cls: 'footer__logo footer__logo--main' },
-    { src: '/icons/logo2.svg',             alt: 'Partner logo', cls: 'footer__logo footer__logo--circle' },
-    { src: '/icons/rs_school_js_logo.svg', alt: 'RS School',   cls: 'footer__logo footer__logo--rs' },
+    { src: '../../icons/LogoFooter.svg',              alt: 'Online Zoo',  cls: 'footer__logo footer__logo--main' },
+    { src: '../../icons/logo2.svg',             alt: 'Partner logo', cls: 'footer__logo footer__logo--circle' },
+    { src: '../../icons/rs_school_js_logo.svg', alt: 'RS School',   cls: 'footer__logo footer__logo--rs' },
   ];
 
   logoData.forEach(({ src, alt, cls }) => {
@@ -72,10 +72,13 @@ function buildTemplate() {
   nav.appendChild(navList);
 
   // Donate button
-  const donate = document.createElement('a');
+  const donate = document.createElement('button');
   donate.className = 'footer__donate';
-  donate.href = '#';
+  donate.type = 'button';
   donate.setAttribute('aria-label', 'Donate for volunteers');
+  donate.addEventListener('click', () => {
+    donate.dispatchEvent(new CustomEvent('donate-click', { bubbles: true, composed: true }));
+  });
 
   const donateText = document.createElement('span');
   donateText.className = 'footer__donate-text';

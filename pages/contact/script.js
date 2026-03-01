@@ -1,5 +1,11 @@
 import '../../src/styles/main.scss';
 import './contact.scss';
+import '../../components/donate-popup/donate-popup.js';
+
+// ─── Donate popup (footer button) ──────────────────────────────────────────
+document.addEventListener('donate-click', () => {
+  document.getElementById('donate-popup')?.open();
+});
 
 // Form validation
 const form = document.querySelector('.get-in-touch__form');

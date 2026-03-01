@@ -4,8 +4,6 @@ import '../../components/donate-popup/donate-popup.js';
 
 document.addEventListener('DOMContentLoaded', () => {
   const donatePopup = document.getElementById('donate-popup');
-  // animal-page donate buttons dispatch a composed 'donate-click' event
-  // footer "Donate for volunteers" also dispatches the same event
   document.addEventListener('donate-click', () => {
     donatePopup?.open();
   });
