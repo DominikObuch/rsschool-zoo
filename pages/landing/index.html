@@ -9,6 +9,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet" />
     <title>Online Zoo — About</title>
     <script type="module" src="../../components/layout/layout.js"></script>
+    <script type="module" src="../../components/slider/slider.js"></script>
+    <script type="module" src="../../components/animal-card/animal-card.js"></script>
     <script type="module" src="./script.js"></script>
   </head>
   <body>
@@ -75,6 +77,322 @@
           </div>
         </div>
 
+      </section>
+
+      <!-- ─── Donation ─────────────────────────────────────────────────────── -->
+      <section class="donation">
+        <div class="donation__content">
+          <h2 class="donation__title">your donation makes a difference!</h2>
+          <p class="donation__subtitle">
+            The Online Zoo's animal webcams are some of the most famous on
+            the internet. Tune in to watch your favourite animals — live, 24/7!
+          </p>
+        </div>
+        <div class="donation__widget">
+          <p class="donation__widget-label">Quick Donate</p>
+          <div class="donation__form">
+            <input
+              class="donation__amount"
+              type="text"
+              placeholder="$ DONATION AMOUNT"
+              aria-label="Donation amount"
+            />
+            <button class="donation__submit" type="button" aria-label="Submit donation"></button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ─── Pets ──────────────────────────────────────────────────────── -->
+      <section class="pets">
+        <h2 class="pets__title">meet some of our pets</h2>
+        <p class="pets__text">
+          Do you have a special place in your heart for animals? Who are your
+          favorites? Perhaps you'd like to donate to special ones or all our
+          pets? We think it's important for you to choose how your donation is used.
+        </p>
+
+        <zoo-slider class="pets__slider">
+          <animal-card
+            nickname="Lucas"
+            species="Giant Panda"
+            description="Native to central China, giant pandas have come to symbolize vulnerable species."
+            image="/images/meetOurAnimals/image 117.png"
+            href="../zoo/index.html"
+          ></animal-card>
+          <animal-card
+            nickname="Andy"
+            species="Madagascarian Lemur"
+            description="Lemurs are considered the world's most endangered group of mammals."
+            image="/images/meetOurAnimals/image 118.png"
+            href="../zoo/index.html"
+          ></animal-card>
+          <animal-card
+            nickname="Glen"
+            species="Gorilla in Congo"
+            description="Variety of snacks very important for the healthy life of gorillas and his plenty of babies."
+            image="/images/meetOurAnimals/image 119.png"
+            href="../zoo/index.html"
+          ></animal-card>
+          <animal-card
+            nickname="Mike"
+            species="Chinese Alligator"
+            description="From nose to tail, hard scales protect the alligator."
+            image="/images/meetOurAnimals/image 122.png"
+            href="../zoo/index.html"
+          ></animal-card>
+          <animal-card
+            nickname="Sam &amp; Lora"
+            species="West End Bald Eagles"
+            description="Pair of eagle parents lay and protect eggs, feed their chicks and teach them to hunt and fly."
+            image="/images/meetOurAnimals/Rectangle 39.png"
+            href="../zoo/index.html"
+          ></animal-card>
+          <animal-card
+            nickname="Liz"
+            species="Australian Koala"
+            description="The elevated walkways bring you to eye level with the koalas as they perch in their forest."
+            image="/images/meetOurAnimals/Rectangle 39-1.png"
+            href="../zoo/index.html"
+          ></animal-card>
+          <animal-card
+            nickname="Shake"
+            species="African Lion"
+            description="Lions roam the savannas and grasslands of Africa, hunting and raising cubs in the pride."
+            image="/images/meetOurAnimals/Rectangle 39-2.png"
+            href="../zoo/index.html"
+          ></animal-card>
+          <animal-card
+            nickname="Senja"
+            species="Sumatran Tiger"
+            description="Sumatran Tigers are the smallest of the five sub-species, found only in Indonesia."
+            image="/images/meetOurAnimals/image 121.png"
+            href="../zoo/index.html"
+          ></animal-card>
+        </zoo-slider>
+
+        <a href="../zoo/index.html" class="pets__cta">choose your favourite</a>
+      </section>
+
+      <!-- ─── Pay & Feed ──────────────────────────────────────────────────── -->
+      <section class="pay-feed">
+        <h2 class="pay-feed__title">pay and feed</h2>
+
+        <!-- step 01 -->
+        <div class="pay-feed__step">
+          <div class="pay-feed__step-header">
+            <span class="pay-feed__step-number">01</span>
+            <hr class="pay-feed__step-divider" />
+          </div>
+          <div class="pay-feed__step-body">
+            <img
+              class="pay-feed__step-image"
+              src="/images/payAndFeed/Rectangle 36.png"
+              alt="Chimpanzee reaching with a blade of grass"
+            />
+            <div class="pay-feed__step-info">
+              <img class="pay-feed__step-icon" src="/icons/heart.svg" alt="" aria-hidden="true" />
+              <h3 class="pay-feed__step-heading">your donation has an impact</h3>
+              <p class="pay-feed__step-text">
+                Providing our animals with high-quality nutritious diets is just one element of
+                animal care at our Zoo. We do all the best so that our animals can eat food
+                similar to what they might find in their natural habitats while making sure they
+                get the right mix of nutrients, proteins, and vitamins to be happy and healthy.
+                Please help us provide nutritious food for our animals by donating. The generosity
+                of people like you can help us make sure that our animals enjoy good food that
+                keeps them in great condition.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- step 02 -->
+        <div class="pay-feed__step">
+          <div class="pay-feed__step-header">
+            <span class="pay-feed__step-number">02</span>
+            <hr class="pay-feed__step-divider" />
+          </div>
+          <div class="pay-feed__step-body">
+            <img
+              class="pay-feed__step-image"
+              src="/images/payAndFeed/Rectangle 37.png"
+              alt="Hand holding a bunch of bananas"
+            />
+            <div class="pay-feed__step-info">
+              <img class="pay-feed__step-icon" src="/icons/paying.svg" alt="" aria-hidden="true" />
+              <h3 class="pay-feed__step-heading">make a donation</h3>
+              <p class="pay-feed__step-text">
+                You can donate through your credit card without any fees. It is easy and safe.
+                We do not keep donors' personal information on an online network. Choose an amount
+                to give and the pet's name if needed. One of the most effective ways you can give
+                is by making regular donations.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- step 03 -->
+        <div class="pay-feed__step">
+          <div class="pay-feed__step-header">
+            <span class="pay-feed__step-number">03</span>
+            <hr class="pay-feed__step-divider" />
+          </div>
+          <div class="pay-feed__step-body">
+            <img
+              class="pay-feed__step-image"
+              src="/images/payAndFeed/Rectangle 38.png"
+              alt="Chimpanzee eating a banana"
+            />
+            <div class="pay-feed__step-info">
+              <img class="pay-feed__step-icon" src="/icons/groceries.svg" alt="" aria-hidden="true" />
+              <h3 class="pay-feed__step-heading">bring your food charity — straight to your favorites pets.</h3>
+              <p class="pay-feed__step-text">
+                After your donation, the animal receives its favorite foods. You can support your
+                favorite animals or any animal you care about and make a real personal impact.
+                Never doubt that your donation can make a difference even if it is small.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- CTA — will open <donate-popup> once that component is built -->
+        <button class="pay-feed__cta" type="button">donate now</button>
+      </section>
+
+      <!-- ─── Reviews ─────────────────────────────────────────────────────── -->
+      <section class="reviews">
+        <div class="reviews__intro">
+          <h2 class="reviews__title">what our users think</h2>
+          <p class="reviews__subtitle">
+            We are continuously striving to improve the experiences of our future
+            guests. Below you can leave your own feedback, or simply view feedback
+            from past clients.
+          </p>
+
+        </div>
+
+        <div class="reviews__slider-wrap">
+          <zoo-slider>
+
+            <article class="review-card">
+              <span class="review-card__quote" aria-hidden="true"></span>
+              <h3 class="review-card__location">New Jersey, June 2020</h3>
+              <p class="review-card__body">I am writing to thank you for your mission is to bring people closer to nature! Like myself, children were very impressed by the opportunity to explore the life of incredible animals in real-time.</p>
+              <p class="review-card__author">Karen Maithlan</p>
+            </article>
+
+            <article class="review-card">
+              <span class="review-card__quote" aria-hidden="true"></span>
+              <h3 class="review-card__location">Toronto, November 2020</h3>
+              <p class="review-card__body">We so enjoy the ever-evolving selection of animals from around the globe. Thank you for sharing these fascinating animal friends with us so that we may learn and increase our understanding of the animal kingdom.</p>
+              <p class="review-card__author">Carol Larsen</p>
+            </article>
+
+            <article class="review-card">
+              <span class="review-card__quote" aria-hidden="true"></span>
+              <h3 class="review-card__location">London, February 2020</h3>
+              <p class="review-card__body">A fantastic experience for kids and adults alike! If anyone is looking for an attraction that educates people on wild animals — it's for you! I highly recommend seeing for yourself the variety of animals on your screen.</p>
+              <p class="review-card__author">C. Stockman</p>
+            </article>
+
+            <article class="review-card">
+              <span class="review-card__quote" aria-hidden="true"></span>
+              <h3 class="review-card__location">Amsterdam, June 2020</h3>
+              <p class="review-card__body">I want to thank you for the amazing sites you find to put your cameras to let each of us see things that we would probably never see on our own. There are so many positives on Zoo Online and I'm grateful for it. Thank you so much!</p>
+              <p class="review-card__author">Tomas Ray</p>
+            </article>
+
+          </zoo-slider>
+        </div>
+
+        <a href="../contact/index.html" class="reviews__leave">Leave feedback</a>
+      </section>
+
+      <!-- ─── Care ─────────────────────────────────────────────────────────── -->
+      <section class="care">
+        <h2 class="care__title">care for the animals you love</h2>
+        <p class="care__subtitle">You can help to look after the animals you love with your gift today</p>
+
+        <div class="care__grid">
+          <!-- plain decorative image — non-interactive -->
+          <div class="care__plain">
+            <img
+              class="care__plain-img"
+              src="/images/chooseFavorite/koala.png"
+              alt="Australian Koala perched in a tree"
+            />
+          </div>
+
+          <!-- feed card 1: Panda (wide horizontal at desktop) -->
+          <a class="care__card" href="../zoo/index.html">
+            <img
+              class="care__card-image"
+              src="/images/chooseFavorite/panda.png"
+              alt="Lucas the Giant Panda eating a cake"
+            />
+            <div class="care__card-body">
+              <p class="care__card-text">Your $30 could give Lucas a slice of panda cake, made with our secret recipe.</p>
+              <span class="care__card-feed">feed</span>
+            </div>
+          </a>
+
+          <!-- feed card 2: Lemur -->
+          <a class="care__card" href="../zoo/index.html">
+            <img
+              class="care__card-image"
+              src="/images/chooseFavorite/lemur.png"
+              alt="Andy the Madagascarian Lemur eating fruit"
+            />
+            <div class="care__card-body">
+              <p class="care__card-text">With your support, we can give Andy his favorite fruits. Especially when it&rsquo;s not fruit season in its natural habitat.</p>
+              <span class="care__card-feed">feed</span>
+            </div>
+          </a>
+
+          <!-- feed card 3: Tiger -->
+          <a class="care__card" href="../zoo/index.html">
+            <img
+              class="care__card-image"
+              src="/images/chooseFavorite/tiger.png"
+              alt="Senja the Sumatran Tiger"
+            />
+            <div class="care__card-body">
+              <p class="care__card-text">Your $150 will help to care for Senja, a Sumatran tiger, for three weeks.</p>
+              <span class="care__card-feed">feed</span>
+            </div>
+          </a>
+
+          <!-- feed card 4: Eagles -->
+          <a class="care__card" href="../zoo/index.html">
+            <img
+              class="care__card-image"
+              src="/images/chooseFavorite/eagle.png"
+              alt="Sam and Lora the Bald Eagles in their nest"
+            />
+            <div class="care__card-body">
+              <p class="care__card-text">Sam &amp; Lora have hatched and raised numerous young and will be happy with your help.</p>
+              <span class="care__card-feed">feed</span>
+            </div>
+          </a>
+        </div>
+
+        <!-- mobile-only dot navigation (shown via CSS at ≤639px) -->
+        <div class="care__dots" aria-label="care slide navigation">
+          <button type="button" class="care__dot care__dot--active" aria-label="Slide 1"></button>
+          <button type="button" class="care__dot" aria-label="Slide 2"></button>
+          <button type="button" class="care__dot" aria-label="Slide 3"></button>
+          <button type="button" class="care__dot" aria-label="Slide 4"></button>
+        </div>
+
+        <a href="../zoo/index.html" class="care__cta">choose your favourite</a>
+
+        <!-- decorative full-width touch-the-animal image -->
+        <div class="care__touch">
+          <img
+            class="care__touch-img"
+            src="/images/chooseFavorite/Touch the animal2 1.png"
+            alt="Person touching an animal on a screen"
+          />
+        </div>
       </section>
 
     </zoo-layout>

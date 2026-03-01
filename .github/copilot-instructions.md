@@ -185,6 +185,8 @@ Page *sections* (`.hero`, `.how-it-works`, `.donation`, `.pets`, `.pay-feed`, `.
 - No JS is needed inside a page section unless the section contains an interactive component (e.g. `<zoo-slider>`); the section markup itself stays JS-free.
 - `text-transform: uppercase` in SCSS for any visually all-caps text — text in HTML is always lowercase.
 - Background images for hero-style sections are set via SCSS `background-image` — no `<img>` tag at desktop; a fallback `<img class="section__image">` may be added for mobile and hidden at wider viewports using `display: none`.
+- Section icons (e.g., `.pay-feed__step-icon`) are included as `<img src="/icons/icon-name.svg">` tags in the page HTML. All icons live in `public/icons/`. To tint a monochrome SVG icon to a design colour, use a CSS `filter` chain in the companion SCSS file — do **not** edit the SVG file or embed it inline.
+- The `.pay-feed` section is an example of this pattern: it is written as plain HTML in `pages/landing/index.html` and `pages/zoo/index.html`, styled exclusively in `pages/landing/landing.scss` / `pages/zoo/zoo.scss`, and uses `<img>` icon tags filtered to turquoise and `<button class="pay-feed__cta">` (not a web component) for the orange CTA.
 
 ### Example
 
