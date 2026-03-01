@@ -1,1 +1,116 @@
-// Contact page styles
+@use '../../src/styles/variables' as *;
+
+// ─── Contact Hero ─────────────────────────────────────────────────────────────
+
+.contact-hero {
+  width: 100%;
+  overflow: hidden;
+  line-height: 0; // collapse whitespace gap under img
+
+  &__image {
+    display: block;
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+    max-height: 580px;
+  }
+}
+
+// ─── Get In Touch ─────────────────────────────────────────────────────────────
+
+.get-in-touch {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 60px;
+  align-items: start;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 72px 40px 96px;
+
+  &__intro {
+    // left column on desktop
+  }
+
+  &__title {
+    color: $color-turquoise;
+    font-size: 2.5rem;
+    font-weight: $font-weight-bold;
+    text-transform: uppercase;
+    line-height: 1.15;
+    margin: 0 0 24px;
+  }
+
+  &__desc {
+    color: $color-navy;
+    font-size: 0.9375rem;
+    line-height: 1.75;
+    margin: 0;
+  }
+
+  &__form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  &__cta {
+    margin-top: 4px;
+  }
+}
+
+// ─── Breakpoint 1200 px ───────────────────────────────────────────────────────
+
+@media (max-width: 1200px) {
+  .get-in-touch {
+    gap: 40px;
+    padding: 56px 32px 72px;
+  }
+}
+
+// ─── Breakpoint 640 px — stack to single column ───────────────────────────────
+
+@media (max-width: 640px) {
+  .contact-hero__image {
+    max-height: 380px;
+  }
+
+  .get-in-touch {
+    grid-template-columns: 1fr;
+    gap: 32px;
+    max-width: 480px;
+    padding: 40px 24px 64px;
+
+    &__title {
+      font-size: 1.75rem;
+      text-align: center;
+    }
+
+    &__desc {
+      text-align: center;
+    }
+
+    &__cta {
+      align-self: center;
+    }
+  }
+}
+
+// ─── Breakpoint 320 px ────────────────────────────────────────────────────────
+
+@media (max-width: 320px) {
+  .contact-hero__image {
+    max-height: 220px;
+  }
+
+  .get-in-touch {
+    padding: 28px 16px 48px;
+
+    &__title {
+      font-size: 1.375rem;
+    }
+
+    &__desc {
+      font-size: 0.875rem;
+    }
+  }
+}
