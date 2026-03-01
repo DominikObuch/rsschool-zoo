@@ -48,7 +48,7 @@ $transition-base: 0.2s ease;
   width: $w;
   height: $h;
   background-color: currentColor;
-  -webkit-mask: url('/icons/arrow.svg') no-repeat center / contain;
-          mask: url('/icons/arrow.svg') no-repeat center / contain;
+  -webkit-mask: url('../../public/icons/arrow.svg') no-repeat center / contain;
+          mask: url('../../public/icons/arrow.svg') no-repeat center / contain;
   vertical-align: middle;
 }

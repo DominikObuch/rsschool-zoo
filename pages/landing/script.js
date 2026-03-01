@@ -1,5 +1,7 @@
 import '../../src/styles/main.scss';
 import './landing.scss';
+import '../../components/donate-popup/donate-popup.js';
+import '../../components/feed-popup/feed-popup.js';
 
 // ─── Donation quick-donate ────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
@@ -12,8 +14,21 @@ document.addEventListener('DOMContentLoaded', () => {
       amountInput?.focus();
       return;
     }
-    // TODO: open <feed-popup> with pre-filled amount once the component is built
-    console.log('Donate:', amount);
+    const feedPopup = document.getElementById('feed-popup');
+    if (feedPopup) {
+      feedPopup.setAmount(amount);
+      feedPopup.open(1);
+    }
+  });
+
+  // ─── Care section — "feed" buttons open feed-popup ──────────────────────
+  const feedPopupEl = document.getElementById('feed-popup');
+  document.querySelectorAll('.care__card-feed').forEach(feedBtn => {
+    feedBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      feedPopupEl?.open(1);
+    });
   });
 
   // ─── Care section mobile slider ──────────────────────────────────────────
@@ -55,4 +70,15 @@ document.addEventListener('DOMContentLoaded', () => {
   careResizeObserver.observe(document.documentElement);
 
   updateCareSlider();
+
+  // ─── Donate Now button (pay-feed section) ───────────────────────────────
+  const donatePopup = document.getElementById('donate-popup');
+  document.querySelector('.pay-feed__cta')?.addEventListener('click', () => {
+    donatePopup?.open();
+  });
+
+  // ─── Footer "Donate for volunteers" ─────────────────────────────────────
+  document.addEventListener('donate-click', () => {
+    donatePopup?.open();
+  });
 });
