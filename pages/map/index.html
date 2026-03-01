@@ -12,8 +12,23 @@
     <script type="module" src="./script.js"></script>
   </head>
   <body>
+    <h1 class="map__sr-only">Online Zoo</h1>
     <zoo-layout active="map">
-      <!-- page sections go here -->
+
+      <!-- ─── Map ─────────────────────────────────────────────────────── -->
+      <section class="map">
+        <h2 class="map__title">find where are the animals live</h2>
+
+        <div class="map__container">
+          <img
+            class="map__image"
+            src="/icons/map.svg"
+            alt="World map showing animal habitats"
+            draggable="false"
+          />
+        </div>
+      </section>
+
     </zoo-layout>
   </body>
 </html>

@@ -35,8 +35,8 @@ function buildTemplate() {
   logos.className = 'footer__logos';
 
   const logoData = [
-    { src: '/icons/Logo.svg',              alt: 'Online Zoo',  cls: 'footer__logo footer__logo--main' },
-    { src: '/icons/logo2.png',             alt: 'Partner logo', cls: 'footer__logo footer__logo--circle' },
+    { src: '/icons/LogoFooter.svg',              alt: 'Online Zoo',  cls: 'footer__logo footer__logo--main' },
+    { src: '/icons/logo2.svg',             alt: 'Partner logo', cls: 'footer__logo footer__logo--circle' },
     { src: '/icons/rs_school_js_logo.svg', alt: 'RS School',   cls: 'footer__logo footer__logo--rs' },
   ];
 
