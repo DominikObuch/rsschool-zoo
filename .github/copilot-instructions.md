@@ -173,6 +173,58 @@ export default ZooHeader;
 
 ---
 
+## Page Section Pattern
+
+Page *sections* (`.hero`, `.how-it-works`, `.donation`, `.pets`, `.pay-feed`, `.reviews`, `.care`, `.live-cams`, `.did-you-know`, `.get-in-touch`) are **plain HTML written directly in the page `index.html`**. They are not web components, do not use Shadow DOM, and do not require any JavaScript.
+
+### Rules
+
+- Write section markup as regular `<section>` elements slotted inside `<zoo-layout>`.
+- All section styles live in the page-level SCSS file (`landing.scss`, `zoo.scss`, etc.), never inline.
+- Do **not** create a web component (`customElements.define`) for a page section — only reusable cross-page UI (header, footer, cards, sliders, popups) becomes a component.
+- No JS is needed inside a page section unless the section contains an interactive component (e.g. `<zoo-slider>`); the section markup itself stays JS-free.
+- `text-transform: uppercase` in SCSS for any visually all-caps text — text in HTML is always lowercase.
+- Background images for hero-style sections are set via SCSS `background-image` — no `<img>` tag at desktop; a fallback `<img class="section__image">` may be added for mobile and hidden at wider viewports using `display: none`.
+
+### Example
+
+```html
+<!-- pages/landing/index.html -->
+<zoo-layout active="landing">
+  <section class="hero">
+    <div class="hero__content">
+      <h1 class="hero__title">Watch your favorite animal online</h1>
+      <p class="hero__subtitle">…</p>
+      <a href="../zoo/index.html" class="hero__cta">View live cam</a>
+    </div>
+    <!-- mobile-only image, hidden by CSS at desktop -->
+    <img class="hero__image" src="/images/pandatop.png" alt="Giant panda" aria-hidden="true" />
+  </section>
+</zoo-layout>
+```
+
+```scss
+// pages/landing/landing.scss
+@use '../../src/styles/variables' as *;
+
+.hero {
+  background-image: url('/images/pandatop.png');
+  background-size: cover;
+  background-position: right center;
+
+  &__image { display: none; } // shown only at ≤480 px
+
+  &__cta { text-transform: uppercase; } // all-caps via CSS, not HTML
+
+  @media (max-width: 480px) {
+    background-image: none;
+    &__image { display: block; }
+  }
+}
+```
+
+---
+
 ## SCSS / BEM Conventions
 
 All styles follow **BEM** (Block Element Modifier):

@@ -116,10 +116,8 @@
   }
 
   &__donate-arrow {
-    font-size: 1.25rem;
-    color: $color-white;
+    @include arrow-svg(20px, 18px, false);
     transition: color $transition-base;
-    line-height: 1;
   }
 
   // ── Divider ─────────────────────────────────────────────────────────────────
