@@ -1,0 +1,37 @@
+@use 'sass:color';
+@use '../../src/styles/variables' as *;
+
+.amount-btn {
+  display:         inline-flex;
+  align-items:     center;
+  justify-content: center;
+  cursor:          pointer;
+  font-family:     $font-family-base;
+  font-size:       $btn-font-size;
+  font-weight:     $font-weight-bold;
+  letter-spacing:  $btn-letter-spacing;
+  text-transform:  uppercase;
+  border:          none;
+  border-radius:   $btn-border-radius;
+  padding:         $btn-padding-v $btn-padding-h;
+  color:           $color-white;
+  background-color: color.mix($color-white, $color-turquoise, 40%);
+  transition:      background-color $transition-base;
+
+  // Default (no modifier) and not-active share the same muted teal
+  &--inactive {
+    background-color: color.mix($color-white, $color-turquoise, 40%);
+
+    &:hover {
+      background-color: $color-turquoise;
+    }
+  }
+
+  &--active {
+    background-color: $color-turquoise;
+
+    &:hover {
+      background-color: $color-turquoise-dark;
+    }
+  }
+}
