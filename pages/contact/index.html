@@ -9,11 +9,69 @@
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet" />
     <title>Online Zoo — Contact Us</title>
     <script type="module" src="../../components/layout/layout.js"></script>
+    <script type="module" src="../../components/zoo-input/zoo-input.js"></script>
+    <script type="module" src="../../components/zoo-btn/zoo-btn.js"></script>
     <script type="module" src="./script.js"></script>
   </head>
   <body>
     <zoo-layout active="contact">
-      <!-- page sections go here -->
+
+      <section class="contact-hero">
+        <img
+          class="contact-hero__image"
+          src="/images/Touch%20the%20animal%201.png"
+          alt="Leo, Western National Park cam 1 — live stream on laptop"
+        />
+      </section>
+
+      <section class="get-in-touch">
+        <div class="get-in-touch__intro">
+          <h1 class="get-in-touch__title">get in touch</h1>
+          <p class="get-in-touch__desc">
+            Whether you have a question, or would like to say hello, we're
+            happy to hear from you. Please use the form to send us a message
+            and we'll get back to you as soon as we can. Whether you have a
+            question, or would like to say hello, we're happy to hear from
+            you. Please use the form to send us a message and we'll get back
+            to you as soon as we can.
+          </p>
+        </div>
+
+        <form class="get-in-touch__form" novalidate>
+          <zoo-input
+            label="* Your Name"
+            name="name"
+            placeholder="First and last name"
+            required
+          ></zoo-input>
+          <zoo-input
+            label="* Your Email Address"
+            name="email"
+            type="email"
+            placeholder="Enter your email"
+            required
+          ></zoo-input>
+          <zoo-input
+            label="* Subject"
+            name="subject"
+            placeholder="Enter the subject"
+            required
+          ></zoo-input>
+          <zoo-input
+            label="* Message"
+            name="message"
+            placeholder="Enter your message"
+            required
+            multiline
+          ></zoo-input>
+          <zoo-btn
+            variant="turquoise"
+            label="send message"
+            class="get-in-touch__cta"
+          ></zoo-btn>
+        </form>
+      </section>
+
     </zoo-layout>
   </body>
 </html>
