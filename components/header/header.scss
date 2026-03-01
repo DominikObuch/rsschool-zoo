@@ -1,0 +1,225 @@
+@use '../../src/styles/variables' as *;
+
+// ─── Header ───────────────────────────────────────────────────────────────────
+
+.header {
+  background: $color-orange;
+  width: 100%;
+  position: relative;
+
+  &__inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 80px;
+    max-width: 1720px;
+    margin: 0 auto;
+    padding: 0 80px;
+  }
+
+  // ── Logo ────────────────────────────────────────────────────────────────────
+  &__logo-link {
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+    text-decoration: none;
+  }
+
+  &__logo {
+    height: 50px;
+    width: auto;
+    display: block;
+  }
+
+  // ── Nav ─────────────────────────────────────────────────────────────────────
+  &__nav {
+    display: flex;
+    align-items: center;
+  }
+
+  &__nav-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    gap: 48px;
+  }
+
+  &__nav-link {
+    font-family: $font-family-base;
+    font-weight: $font-weight-bold;
+    font-size: 1rem;
+    letter-spacing: $btn-letter-spacing;
+    text-transform: uppercase;
+    text-decoration: none;
+    color: $color-black;
+    transition: color $transition-base;
+    white-space: nowrap;
+
+    &--active {
+      color: $color-turquoise;
+    }
+
+    &:hover:not(&--active) {
+      color: $color-turquoise-dark;
+    }
+  }
+
+  // ── Social icons ────────────────────────────────────────────────────────────
+  &__socials {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-shrink: 0;
+  }
+
+  &__social-link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: opacity $transition-base, transform $transition-base;
+
+    &:hover {
+      opacity: 0.85;
+      transform: scale(1.08);
+    }
+
+    img {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: block;
+    }
+  }
+
+  // ── Burger (mobile only) ─────────────────────────────────────────────────────
+  &__burger {
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    gap: 6px;
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    flex-shrink: 0;
+
+    span {
+      display: block;
+      width: 26px;
+      height: 2px;
+      background: $color-black;
+      border-radius: 2px;
+      transition: transform $transition-base, opacity $transition-base;
+    }
+
+    &[aria-expanded='true'] {
+      span:nth-child(1) { transform: translateY(8px) rotate(45deg); }
+      span:nth-child(2) { opacity: 0; }
+      span:nth-child(3) { transform: translateY(-8px) rotate(-45deg); }
+    }
+  }
+
+  // ── Mobile nav drawer ───────────────────────────────────────────────────────
+  &__nav--open {
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    z-index: 100;
+    background: $color-orange;
+    padding: 16px 20px 24px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+}
+
+// ─── Breakpoints ──────────────────────────────────────────────────────────────
+
+// 1200 px — tighten spacing slightly
+@media (max-width: 1200px) {
+  .header {
+    &__inner {
+      padding: 0 40px;
+    }
+
+    &__nav-list {
+      gap: 32px;
+    }
+
+    &__nav-link {
+      font-size: 0.9375rem;
+    }
+  }
+}
+
+// 640 px — collapse to logo + burger
+@media (max-width: 640px) {
+  .header {
+    &__inner {
+      height: 64px;
+      padding: 0 20px;
+    }
+
+    &__logo {
+      height: 42px;
+    }
+
+    &__nav {
+      display: none;
+
+      &--open {
+        display: flex;
+      }
+    }
+
+    &__nav-list {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0;
+      width: 100%;
+    }
+
+    &__nav-link {
+      display: block;
+      padding: 12px 0;
+      width: 100%;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    }
+
+    &__socials {
+      display: none;
+    }
+
+    &__burger {
+      display: flex;
+    }
+  }
+}
+
+// 320 px — tightest mobile
+@media (max-width: 320px) {
+  .header {
+    &__inner {
+      height: 56px;
+      padding: 0 12px;
+    }
+
+    &__logo {
+      height: 36px;
+    }
+
+    &__burger {
+      width: 30px;
+      height: 30px;
+
+      span {
+        width: 22px;
+      }
+    }
+  }
+}

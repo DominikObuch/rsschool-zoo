@@ -1,4 +1,9 @@
-@use 'variables' as *;
+@use '../../src/styles/variables' as *;
+
+// ─── Host ─────────────────────────────────────────────────────────────────────
+:host {
+  display: inline-flex;
+}
 
 // ─── Base ─────────────────────────────────────────────────────────────────────
 .btn {
@@ -21,8 +26,14 @@
     border-color     $transition-base;
 
   &::after {
-    content: '→';
+    content:    '→';
     font-style: normal;
+  }
+
+  &:disabled,
+  &[disabled] {
+    opacity: 0.45;
+    cursor:  not-allowed;
   }
 }
 
@@ -31,7 +42,7 @@
   background-color: $color-turquoise;
   color:            $color-white;
 
-  &:hover {
+  &:hover:not(:disabled) {
     background-color: $color-turquoise-dark;
   }
 }
@@ -41,7 +52,7 @@
   background-color: $color-orange;
   color:            $color-white;
 
-  &:hover {
+  &:hover:not(:disabled) {
     background-color: $color-orange-dark;
   }
 }
@@ -51,7 +62,7 @@
   background-color: $color-navy;
   color:            $color-white;
 
-  &:hover {
+  &:hover:not(:disabled) {
     background-color: $color-navy-dark;
   }
 }
@@ -62,7 +73,7 @@
   color:            $color-navy;
   border:           1.5px solid $color-navy;
 
-  &:hover {
+  &:hover:not(:disabled) {
     background-color: $color-navy;
     color:            $color-white;
   }
@@ -76,13 +87,12 @@
   border-radius:    0;
   padding:          0;
 
-  &:hover {
+  &:hover:not(:disabled) {
     color: $color-orange-dark;
   }
 }
 
 // ─── Arrow: Standalone → glyph, no label, no box ─────────────────────────────
-// textContent is '→' — ::after not used here, suppress it
 .btn--arrow {
   background-color: transparent;
   color:            $color-navy;
@@ -96,13 +106,12 @@
     content: none; // arrow IS the text content — no ::after duplicate
   }
 
-  &:hover {
+  &:hover:not(:disabled) {
     color: $color-orange;
   }
 }
 
 // ─── Nav: Square ←/→ slider controls ─────────────────────────────────────────
-// textContent is '←' or '→' — no ::after
 .btn--nav {
   width:            $btn-icon-size;
   height:           $btn-icon-size;
@@ -118,7 +127,7 @@
     content: none;
   }
 
-  &:hover,
+  &:hover:not(:disabled),
   &--active {
     background-color: $color-navy;
     color:            $color-white;

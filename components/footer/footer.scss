@@ -1,0 +1,326 @@
+@use '../../src/styles/variables' as *;
+
+// ─── Footer ───────────────────────────────────────────────────────────────────
+
+.footer {
+  background: $color-navy;
+  color: $color-white;
+  width: 100%;
+
+  &__inner {
+    max-width: 1720px;
+    margin: 0 auto;
+    padding: 0 80px;
+  }
+
+  // ── Upper band ──────────────────────────────────────────────────────────────
+  &__upper {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 40px;
+    padding: 40px 0 36px;
+  }
+
+  // ── Logos ───────────────────────────────────────────────────────────────────
+  &__logos {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    flex-shrink: 0;
+  }
+
+  &__logo {
+    display: block;
+
+    &--main {
+      height: 56px;
+      width: auto;
+    }
+
+    &--circle {
+      height: 56px;
+      width: 56px;
+      object-fit: contain;
+    }
+
+    &--rs {
+      height: 56px;
+      width: auto;
+    }
+  }
+
+  // ── Nav ─────────────────────────────────────────────────────────────────────
+  &__nav {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+  }
+
+  &__nav-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    gap: 48px;
+  }
+
+  &__nav-link {
+    font-family: $font-family-base;
+    font-weight: $font-weight-bold;
+    font-size: 1rem;
+    letter-spacing: $btn-letter-spacing;
+    text-transform: uppercase;
+    text-decoration: none;
+    color: $color-white;
+    white-space: nowrap;
+    transition: color $transition-base;
+
+    &:hover {
+      color: $color-orange;
+    }
+  }
+
+  // ── Donate button ───────────────────────────────────────────────────────────
+  &__donate {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    flex-shrink: 0;
+    padding: 14px 28px;
+    border: 2px solid $color-white;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background $transition-base, color $transition-base;
+
+    &:hover {
+      background: $color-white;
+
+      .footer__donate-text,
+      .footer__donate-arrow {
+        color: $color-navy;
+      }
+    }
+  }
+
+  &__donate-text {
+    font-family: $font-family-base;
+    font-weight: $font-weight-bold;
+    font-size: 1rem;
+    letter-spacing: $btn-letter-spacing;
+    text-transform: uppercase;
+    color: $color-white;
+    white-space: nowrap;
+    transition: color $transition-base;
+  }
+
+  &__donate-arrow {
+    font-size: 1.25rem;
+    color: $color-white;
+    transition: color $transition-base;
+    line-height: 1;
+  }
+
+  // ── Divider ─────────────────────────────────────────────────────────────────
+  &__divider {
+    border: none;
+    border-top: 1px solid rgba(255, 255, 255, 0.25);
+    margin: 0;
+  }
+
+  // ── Lower band ──────────────────────────────────────────────────────────────
+  &__lower {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    padding: 24px 0;
+  }
+
+  // ── Credits ─────────────────────────────────────────────────────────────────
+  &__credits {
+    display: flex;
+    align-items: center;
+    gap: 40px;
+    flex-wrap: wrap;
+  }
+
+  &__credit {
+    font-family: $font-family-base;
+    font-size: 0.875rem;
+    color: rgba(255, 255, 255, 0.65);
+    white-space: nowrap;
+  }
+
+  // ── Social icons ────────────────────────────────────────────────────────────
+  &__socials {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-shrink: 0;
+  }
+
+  &__social-link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: opacity $transition-base, transform $transition-base;
+
+    &:hover {
+      opacity: 0.85;
+      transform: scale(1.08);
+    }
+
+    img {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: block;
+    }
+  }
+}
+
+// ─── Breakpoints ──────────────────────────────────────────────────────────────
+
+// 1200 px — tighten spacing
+@media (max-width: 1200px) {
+  .footer {
+    &__inner {
+      padding: 0 40px;
+    }
+
+    &__nav-list {
+      gap: 32px;
+    }
+
+    &__nav-link {
+      font-size: 0.9375rem;
+    }
+
+    &__credits {
+      gap: 24px;
+    }
+  }
+}
+
+// 640 px — stack vertically, center-align
+@media (max-width: 640px) {
+  .footer {
+    &__inner {
+      padding: 0 20px;
+    }
+
+    &__upper {
+      flex-direction: column;
+      align-items: center;
+      padding: 32px 0 28px;
+      gap: 24px;
+    }
+
+    &__logos {
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+    }
+
+    &__logo {
+      &--main {
+        height: 50px;
+      }
+
+      &--circle {
+        height: 50px;
+        width: 50px;
+      }
+
+      &--rs {
+        height: 50px;
+      }
+    }
+
+    &__nav {
+      width: 100%;
+      justify-content: center;
+    }
+
+    &__nav-list {
+      gap: 20px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    &__donate {
+      width: 100%;
+      justify-content: center;
+      padding: 16px 20px;
+    }
+
+    &__lower {
+      flex-direction: column-reverse;
+      align-items: center;
+      gap: 20px;
+      padding: 20px 0 28px;
+    }
+
+    &__credits {
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      text-align: center;
+    }
+
+    &__socials {
+      gap: 16px;
+    }
+  }
+}
+
+// 320 px — tightest mobile
+@media (max-width: 320px) {
+  .footer {
+    &__inner {
+      padding: 0 12px;
+    }
+
+    &__upper {
+      padding: 24px 0 20px;
+      gap: 16px;
+    }
+
+    &__logos {
+      gap: 12px;
+    }
+
+    &__logo {
+      &--main  { height: 40px; }
+      &--circle { height: 40px; width: 40px; }
+      &--rs    { height: 40px; }
+    }
+
+    &__nav-list {
+      gap: 12px;
+    }
+
+    &__nav-link {
+      font-size: 0.8125rem;
+    }
+
+    &__donate {
+      padding: 12px 16px;
+    }
+
+    &__donate-text {
+      font-size: 0.875rem;
+    }
+
+    &__social-link img {
+      width: 36px;
+      height: 36px;
+    }
+
+    &__credit {
+      font-size: 0.8125rem;
+    }
+  }
+}
