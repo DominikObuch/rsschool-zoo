@@ -84,7 +84,7 @@ function buildTemplate() {
   const donateArrow = document.createElement('span');
   donateArrow.className = 'footer__donate-arrow';
   donateArrow.setAttribute('aria-hidden', 'true');
-  donateArrow.textContent = '→';
+  donateArrow.textContent = '';
 
   donate.append(donateText, donateArrow);
 

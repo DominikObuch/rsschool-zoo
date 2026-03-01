@@ -32,3 +32,23 @@ $btn-arrow-size-sm: 34px;
 
 // ─── Transitions ──────────────────────────────────────────────────────────────
 $transition-base: 0.2s ease;
+
+// ─── Arrow SVG Mixin ──────────────────────────────────────────────────────────
+// Replaces a Unicode arrow glyph with the project SVG (/icons/arrow.svg).
+// Uses mask-image so the shape inherits `currentColor` — hover colour
+// transitions work automatically with no extra CSS.
+//
+// Usage (pseudo-element):   &::after { @include arrow-svg(16px, 14px); }
+// Usage (real element):     @include arrow-svg(20px, 18px); (omit content:)
+@mixin arrow-svg($w: 18px, $h: 16px, $pseudo: true) {
+  @if $pseudo {
+    content: '';
+  }
+  display: inline-block;
+  width: $w;
+  height: $h;
+  background-color: currentColor;
+  -webkit-mask: url('/icons/arrow.svg') no-repeat center / contain;
+          mask: url('/icons/arrow.svg') no-repeat center / contain;
+  vertical-align: middle;
+}

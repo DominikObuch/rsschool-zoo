@@ -26,7 +26,7 @@
     border-color     $transition-base;
 
   &::after {
-    content:    '→';
+    @include arrow-svg(16px, 14px);
     font-style: normal;
   }
 
@@ -102,8 +102,9 @@
   font-size:        1.25rem;
   line-height:      1;
 
+  // Arrow IS the ::after SVG — override to standalone size
   &::after {
-    content: none; // arrow IS the text content — no ::after duplicate
+    @include arrow-svg(22px, 20px);
   }
 
   &:hover:not(:disabled) {
