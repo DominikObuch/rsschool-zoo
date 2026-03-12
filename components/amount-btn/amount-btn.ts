@@ -2,7 +2,7 @@ import styles from './amount-btn.scss?inline';
 
 const template = document.createElement('template');
 
-function buildTemplate() {
+function buildTemplate(): void {
   const button = document.createElement('button');
   button.className = 'amount-btn amount-btn--inactive';
   button.type = 'button';
@@ -12,11 +12,11 @@ function buildTemplate() {
 buildTemplate();
 
 export class ZooAmountBtn extends HTMLElement {
-  static get observedAttributes() {
+  static get observedAttributes(): string[] {
     return ['label', 'active'];
   }
 
-  connectedCallback() {
+  connectedCallback(): void {
     if (this.shadowRoot) return;
     const shadow = this.attachShadow({ mode: 'open' });
 
@@ -26,29 +26,30 @@ export class ZooAmountBtn extends HTMLElement {
 
     shadow.appendChild(template.content.cloneNode(true));
 
-    // Apply attributes present at connect time
     for (const attr of ZooAmountBtn.observedAttributes) {
       if (this.hasAttribute(attr)) {
         this._applyAttr(attr, this.getAttribute(attr));
       }
     }
 
-    shadow.querySelector('.amount-btn').addEventListener('click', () => {
+    const btn = shadow.querySelector('.amount-btn');
+    btn?.addEventListener('click', () => {
       this.dispatchEvent(new CustomEvent('amount-select', {
-        bubbles:  true,
+        bubbles: true,
         composed: true,
-        detail:   { label: this.getAttribute('label') ?? '' },
+        detail: { label: this.getAttribute('label') ?? '' },
       }));
     });
   }
 
-  attributeChangedCallback(name, _old, newVal) {
+  attributeChangedCallback(name: string, _old: string | null, newVal: string | null): void {
     if (!this.shadowRoot) return;
     this._applyAttr(name, newVal);
   }
 
-  _applyAttr(name, value) {
-    const btn = this.shadowRoot.querySelector('.amount-btn');
+  private _applyAttr(name: string, value: string | null): void {
+    const btn = this.shadowRoot?.querySelector('.amount-btn');
+    if (!btn) return;
 
     switch (name) {
       case 'label':
@@ -56,7 +57,7 @@ export class ZooAmountBtn extends HTMLElement {
         break;
       case 'active': {
         const isActive = value !== null;
-        btn.classList.toggle('amount-btn--active',   isActive);
+        btn.classList.toggle('amount-btn--active', isActive);
         btn.classList.toggle('amount-btn--inactive', !isActive);
         break;
       }

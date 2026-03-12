@@ -1,12 +1,11 @@
 import '../../src/styles/main.scss';
 import './landing.scss';
-import '../../components/donate-popup/donate-popup.js';
-import '../../components/feed-popup/feed-popup.js';
+import type { DonatePopup } from '../../components/donate-popup/donate-popup.ts';
+import type { FeedPopup } from '../../components/feed-popup/feed-popup.ts';
 
-// ─── Donation quick-donate ────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
-  const submitBtn = document.querySelector('.donation__submit');
-  const amountInput = document.querySelector('.donation__amount');
+  const submitBtn = document.querySelector<HTMLButtonElement>('.donation__submit');
+  const amountInput = document.querySelector<HTMLInputElement>('.donation__amount');
 
   submitBtn?.addEventListener('click', () => {
     const amount = amountInput?.value.trim();
@@ -14,7 +13,7 @@ document.addEventListener('DOMContentLoaded', () => {
       amountInput?.focus();
       return;
     }
-    const feedPopup = document.getElementById('feed-popup');
+    const feedPopup = document.getElementById('feed-popup') as FeedPopup | null;
     if (feedPopup) {
       feedPopup.setAmount(amount);
       feedPopup.open(1);
@@ -22,9 +21,9 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // ─── Care section — "feed" buttons open feed-popup ──────────────────────
-  const feedPopupEl = document.getElementById('feed-popup');
-  document.querySelectorAll('.care__card-feed').forEach(feedBtn => {
-    feedBtn.addEventListener('click', (e) => {
+  const feedPopupEl = document.getElementById('feed-popup') as FeedPopup | null;
+  document.querySelectorAll<HTMLElement>('.care__card-feed').forEach((feedBtn) => {
+    feedBtn.addEventListener('click', (e: Event) => {
       e.preventDefault();
       e.stopPropagation();
       feedPopupEl?.open(1);
@@ -32,22 +31,19 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // ─── Care section mobile slider ──────────────────────────────────────────
-  const careCards = Array.from(document.querySelectorAll('.care__card'));
-  const careDots  = Array.from(document.querySelectorAll('.care__dot'));
-  let careIndex   = 0;
+  const careCards = Array.from(document.querySelectorAll<HTMLElement>('.care__card'));
+  const careDots = Array.from(document.querySelectorAll<HTMLElement>('.care__dot'));
+  let careIndex = 0;
 
-  function isMobileCare() {
-    return window.innerWidth <= 639;
-  }
+  const isMobileCare = (): boolean => window.innerWidth <= 639;
 
-  function updateCareSlider() {
+  const updateCareSlider = (): void => {
     if (!isMobileCare()) {
-      // desktop / tablet — remove mobile classes, show all cards
-      careCards.forEach(c => {
+      careCards.forEach((c) => {
         c.classList.remove('care__card--active');
         c.style.display = '';
       });
-      careDots.forEach(d => d.classList.remove('care__dot--active'));
+      careDots.forEach((d) => d.classList.remove('care__dot--active'));
       return;
     }
 
@@ -57,7 +53,7 @@ document.addEventListener('DOMContentLoaded', () => {
     careDots.forEach((dot, i) => {
       dot.classList.toggle('care__dot--active', i === careIndex);
     });
-  }
+  };
 
   careDots.forEach((dot, i) => {
     dot.addEventListener('click', () => {
@@ -72,7 +68,7 @@ document.addEventListener('DOMContentLoaded', () => {
   updateCareSlider();
 
   // ─── Donate Now button (pay-feed section) ───────────────────────────────
-  const donatePopup = document.getElementById('donate-popup');
+  const donatePopup = document.getElementById('donate-popup') as DonatePopup | null;
   document.querySelector('.pay-feed__cta')?.addEventListener('click', () => {
     donatePopup?.open();
   });

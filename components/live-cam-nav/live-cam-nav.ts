@@ -1,19 +1,19 @@
 import styles from './live-cam-nav.scss?inline';
+import type { AnimalNavItem } from '../../src/types.ts';
 
-const ANIMALS = [
-  { slug: 'panda',   icon: '../../icons/Panda.svg',   label: "Watch live from China's Panda Center",       href: '../../pages/panda/index.html' },
-  { slug: 'eagle',   icon: '../../icons/Eagle.svg',   label: 'The Bald Eagles Nest from West End cam',     href: '../../pages/eagle/index.html' },
+const ANIMALS: AnimalNavItem[] = [
+  { slug: 'panda',   icon: '../../icons/Panda.svg',   label: "Watch live from China's Panda Center",          href: '../../pages/panda/index.html' },
+  { slug: 'eagle',   icon: '../../icons/Eagle.svg',   label: 'The Bald Eagles Nest from West End cam',        href: '../../pages/eagle/index.html' },
   { slug: 'gorilla', icon: '../../icons/Gorilla.svg', label: 'Live from Gorilla Forest Corridor habitat cam', href: '../../pages/gorilla/index.html' },
-  { slug: 'lemur',   icon: '../../icons/Lemur.svg',   label: 'Lemurs play in Madagascar, Lemuria …',       href: '../../pages/lemur/index.html' },
+  { slug: 'lemur',   icon: '../../icons/Lemur.svg',   label: 'Lemurs play in Madagascar, Lemuria …',          href: '../../pages/lemur/index.html' },
 ];
 
 const template = document.createElement('template');
 
-function buildTemplate() {
+function buildTemplate(): void {
   const nav = document.createElement('nav');
   nav.className = 'live-cam-nav';
 
-  // ── Header ──────────────────────────────────────────────────────────────────
   const header = document.createElement('div');
   header.className = 'live-cam-nav__header';
 
@@ -24,7 +24,6 @@ function buildTemplate() {
   badgeText.className = 'live-cam-nav__live-text';
   badgeText.textContent = 'live';
 
-  // Person SVG icon (inline, no external file needed)
   const svgNS = 'http://www.w3.org/2000/svg';
   const personSvg = document.createElementNS(svgNS, 'svg');
   personSvg.setAttribute('class', 'live-cam-nav__live-icon');
@@ -59,7 +58,6 @@ function buildTemplate() {
   header.appendChild(badge);
   header.appendChild(toggle);
 
-  // ── Animal List ──────────────────────────────────────────────────────────────
   const list = document.createElement('ul');
   list.className = 'live-cam-nav__list';
 
@@ -88,7 +86,6 @@ function buildTemplate() {
     list.appendChild(item);
   }
 
-  // ── Footer ──────────────────────────────────────────────────────────────────
   const footer = document.createElement('div');
   footer.className = 'live-cam-nav__footer';
 
@@ -109,9 +106,9 @@ function buildTemplate() {
 buildTemplate();
 
 export class LiveCamNav extends HTMLElement {
-  static get observedAttributes() { return ['active']; }
+  static get observedAttributes(): string[] { return ['active']; }
 
-  connectedCallback() {
+  connectedCallback(): void {
     if (this.shadowRoot) return;
     const shadow = this.attachShadow({ mode: 'open' });
 
@@ -121,37 +118,34 @@ export class LiveCamNav extends HTMLElement {
 
     shadow.appendChild(template.content.cloneNode(true));
 
-    // Default: collapsed — matches the design (narrow icon-only panel)
-    shadow.querySelector('.live-cam-nav').classList.add('live-cam-nav--collapsed');
+    shadow.querySelector('.live-cam-nav')?.classList.add('live-cam-nav--collapsed');
 
-    // Toggle expand / collapse
-    shadow.querySelector('.live-cam-nav__toggle').addEventListener('click', () => {
+    shadow.querySelector('.live-cam-nav__toggle')?.addEventListener('click', () => {
       const nav = shadow.querySelector('.live-cam-nav');
+      const btn = shadow.querySelector<HTMLButtonElement>('.live-cam-nav__toggle');
+      if (!nav || !btn) return;
       const isNowCollapsed = nav.classList.toggle('live-cam-nav--collapsed');
-      const btn = shadow.querySelector('.live-cam-nav__toggle');
       btn.textContent = isNowCollapsed ? '»' : '«';
       btn.setAttribute('aria-label', isNowCollapsed ? 'Expand navigation' : 'Collapse navigation');
     });
 
-    // Navigate on item click
-    shadow.querySelectorAll('.live-cam-nav__item').forEach(item => {
+    shadow.querySelectorAll<HTMLElement>('.live-cam-nav__item').forEach((item) => {
       item.addEventListener('click', () => {
         const href = item.dataset.href;
         if (href) window.location.href = href;
       });
     });
 
-    // Highlight the active animal
     this._highlightActive(this.getAttribute('active'));
   }
 
-  attributeChangedCallback(name, _old, newVal) {
+  attributeChangedCallback(name: string, _old: string | null, newVal: string | null): void {
     if (name === 'active') this._highlightActive(newVal);
   }
 
-  _highlightActive(slug) {
+  private _highlightActive(slug: string | null): void {
     if (!this.shadowRoot) return;
-    this.shadowRoot.querySelectorAll('.live-cam-nav__item').forEach(item => {
+    this.shadowRoot.querySelectorAll<HTMLElement>('.live-cam-nav__item').forEach((item) => {
       item.classList.toggle('live-cam-nav__item--active', item.dataset.slug === slug);
     });
   }

@@ -362,7 +362,7 @@
   gap: 8px;
 
   &:hover {
-    background: darken($color-orange, 12%);
+    background: color.adjust($color, $lightness: -12%);
   }
 
   .arrow {

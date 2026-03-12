@@ -1,26 +1,24 @@
 import '../../src/styles/main.scss';
 import './contact.scss';
-import '../../components/donate-popup/donate-popup.js';
+import '../../components/donate-popup/donate-popup.ts';
+import type { DonatePopup } from '../../components/donate-popup/donate-popup.ts';
+import type { ZooInput } from '../../components/zoo-input/zoo-input.ts';
 
-// ─── Donate popup (footer button) ──────────────────────────────────────────
 document.addEventListener('donate-click', () => {
-  document.getElementById('donate-popup')?.open();
+  (document.getElementById('donate-popup') as DonatePopup | null)?.open();
 });
 
-// Form validation
-const form = document.querySelector('.get-in-touch__form');
+const form = document.querySelector<HTMLFormElement>('.get-in-touch__form');
 
 if (form) {
-  const inputs = Array.from(form.querySelectorAll('zoo-input[required]'));
+  const inputs = Array.from(form.querySelectorAll<ZooInput>('zoo-input[required]'));
 
-  // Clear error state as soon as the user types
   inputs.forEach((input) => {
     input.addEventListener('input', () => {
       input.removeAttribute('error');
     });
   });
 
-  // Validate on SEND MESSAGE click
   const btn = form.querySelector('zoo-btn');
   if (btn) {
     btn.addEventListener('zoo-click', () => {
@@ -37,7 +35,6 @@ if (form) {
       });
 
       if (allValid) {
-        // Reset form
         inputs.forEach((input) => {
           input.value = '';
         });

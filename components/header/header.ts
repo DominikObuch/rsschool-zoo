@@ -1,7 +1,7 @@
 import styles from './header.scss?inline';
+import type { NavItem, SocialItem } from '../../src/types.ts';
 
-// ─── Nav items ────────────────────────────────────────────────────────────────
-const NAV_ITEMS = [
+const NAV_ITEMS: NavItem[] = [
   { label: 'About',      page: 'landing', href: '../../pages/landing/' },
   { label: 'Map',        page: 'map',     href: '../../pages/map/' },
   { label: 'Zoos',       page: 'zoo',     href: '../../pages/zoo/' },
@@ -9,25 +9,21 @@ const NAV_ITEMS = [
   { label: 'Design',     page: 'design',  href: 'https://www.figma.com/', target: '_blank' },
 ];
 
-const SOCIAL_ITEMS = [
+const SOCIAL_ITEMS: SocialItem[] = [
   { label: 'YouTube',   icon: '../../icons/YouTube.svg',   href: 'https://www.youtube.com/' },
   { label: 'Instagram', icon: '../../icons/Instagram.svg', href: 'https://www.instagram.com/' },
   { label: 'Facebook',  icon: '../../icons/Facebook.svg',  href: 'https://www.facebook.com/' },
 ];
 
-// ─── Template ─────────────────────────────────────────────────────────────────
 const template = document.createElement('template');
 
-function buildTemplate() {
-  // <header>
+function buildTemplate(): void {
   const header = document.createElement('header');
   header.className = 'header';
 
-  // <div class="header__inner">
   const inner = document.createElement('div');
   inner.className = 'header__inner';
 
-  // Logo
   const logoLink = document.createElement('a');
   logoLink.className = 'header__logo-link';
   logoLink.href = '../../pages/landing/index.html';
@@ -42,7 +38,6 @@ function buildTemplate() {
 
   logoLink.appendChild(logoImg);
 
-  // Nav
   const nav = document.createElement('nav');
   nav.className = 'header__nav';
   nav.setAttribute('aria-label', 'Main navigation');
@@ -50,27 +45,24 @@ function buildTemplate() {
   const navList = document.createElement('ul');
   navList.className = 'header__nav-list';
 
-  NAV_ITEMS.forEach(({ label, page, href, target }) => {
+  NAV_ITEMS.forEach(({ label, page, href, target }: NavItem) => {
     const li = document.createElement('li');
-
     const a = document.createElement('a');
     a.className = 'header__nav-link';
     a.dataset.page = page;
     a.href = href;
-    a.textContent = label; // text-transform: uppercase handled by SCSS
+    a.textContent = label;
     if (target) a.target = target;
-
     li.appendChild(a);
     navList.appendChild(li);
   });
 
   nav.appendChild(navList);
 
-  // Socials
   const socials = document.createElement('div');
   socials.className = 'header__socials';
 
-  SOCIAL_ITEMS.forEach(({ label, icon, href }) => {
+  SOCIAL_ITEMS.forEach(({ label, icon, href }: SocialItem) => {
     const a = document.createElement('a');
     a.className = 'header__social-link';
     a.href = href;
@@ -88,7 +80,6 @@ function buildTemplate() {
     socials.appendChild(a);
   });
 
-  // Burger button (mobile)
   const burger = document.createElement('button');
   burger.className = 'header__burger';
   burger.setAttribute('aria-label', 'Open menu');
@@ -102,7 +93,6 @@ function buildTemplate() {
 
   nav.id = 'header-nav';
 
-  // Assemble
   inner.append(logoLink, nav, socials, burger);
   header.appendChild(inner);
   template.content.appendChild(header);
@@ -110,13 +100,12 @@ function buildTemplate() {
 
 buildTemplate();
 
-// ─── Custom Element ───────────────────────────────────────────────────────────
 export class ZooHeader extends HTMLElement {
-  static get observedAttributes() {
+  static get observedAttributes(): string[] {
     return ['active'];
   }
 
-  connectedCallback() {
+  connectedCallback(): void {
     const shadow = this.attachShadow({ mode: 'open' });
 
     const style = document.createElement('style');
@@ -129,26 +118,23 @@ export class ZooHeader extends HTMLElement {
     this._initBurger();
   }
 
-  attributeChangedCallback(name, _old, newVal) {
+  attributeChangedCallback(name: string, _old: string | null, newVal: string | null): void {
     if (name === 'active') this._highlightActive(newVal);
   }
 
-  _highlightActive(page) {
+  private _highlightActive(page: string | null): void {
     if (!this.shadowRoot) return;
-    this.shadowRoot.querySelectorAll('.header__nav-link').forEach(link => {
-      link.classList.toggle(
-        'header__nav-link--active',
-        link.dataset.page === page
-      );
+    this.shadowRoot.querySelectorAll<HTMLAnchorElement>('.header__nav-link').forEach((link) => {
+      link.classList.toggle('header__nav-link--active', link.dataset.page === page);
     });
   }
 
-  _initBurger() {
+  private _initBurger(): void {
     const root = this.shadowRoot;
     if (!root) return;
 
-    const burger = root.querySelector('.header__burger');
-    const nav    = root.querySelector('.header__nav');
+    const burger = root.querySelector<HTMLButtonElement>('.header__burger');
+    const nav = root.querySelector<HTMLElement>('.header__nav');
     if (!burger || !nav) return;
 
     burger.addEventListener('click', () => {
@@ -157,9 +143,9 @@ export class ZooHeader extends HTMLElement {
       burger.setAttribute('aria-label', isOpen ? 'Close menu' : 'Open menu');
     });
 
-    // Close drawer when a link is clicked
-    nav.addEventListener('click', e => {
-      if (e.target.closest('.header__nav-link')) {
+    nav.addEventListener('click', (e: Event) => {
+      const target = e.target as HTMLElement | null;
+      if (target?.closest('.header__nav-link')) {
         nav.classList.remove('header__nav--open');
         burger.setAttribute('aria-expanded', 'false');
         burger.setAttribute('aria-label', 'Open menu');

@@ -1,11 +1,13 @@
 import styles from './animal-page.scss?inline';
-import '../live-cam-nav/live-cam-nav.js';
-import '../zoo-input/zoo-input.js';
-import '../amount-btn/amount-btn.js';
+import '../live-cam-nav/live-cam-nav.ts';
+import '../zoo-input/zoo-input.ts';
+import '../amount-btn/amount-btn.ts';
+import type { AnimalData, AnimalThumb, AnimalInfo } from '../../src/types.ts';
+import { AnimalSlug } from '../../src/types.ts';
 
-// ─── Animal data — edit this object to update all page content ────────────────
-const ANIMALS = {
-  panda: {
+// ─── Animal data ──────────────────────────────────────────────────────────────
+const ANIMALS: Record<AnimalSlug, AnimalData> = {
+  [AnimalSlug.Panda]: {
     pageTitle:   'live panda cams',
     camLabel:    'Lucas, the Giant Panda cam 1',
     mainImage:   '../../images/youtubePlayer/pandaBig.png',
@@ -32,7 +34,7 @@ const ANIMALS = {
     description: 'Giant pandas are very unusual animals that eat almost exclusively bamboo, which is very low in nutrients. Because of this, they have many unique adaptations for their low-energy lifestyle. Giant pandas are solitary. They have a highly developed sense of smell that males use to avoid each other and to find females for mating in the spring. After a five-month pregnancy, females give birth to a cub or two, though they cannot care for both twins. The blind infants weigh only 5 ounces at birth and cannot crawl until they reach three months of age. They are born white, and develop their much loved coloring later. Habitat loss is the primary threat to this species. Its popularity around the world has helped the giant panda become the focus of successful conservation programs.',
   },
 
-  eagle: {
+  [AnimalSlug.Eagle]: {
     pageTitle:   'bald eagle cams',
     camLabel:    'Bald Eagle cam',
     mainImage:   '../../images/youtubePlayer/baldEagleBIg.png',
@@ -59,7 +61,7 @@ const ANIMALS = {
     description: 'The bald eagle is a bird of prey found in North America. A sea eagle, it has two known subspecies and forms a species pair with the white-tailed eagle. Its range includes most of Canada and Alaska, all of the contiguous United States, and northern Mexico. It is found near large bodies of open water with an abundant food supply and old-growth trees for nesting. The bald eagle is an opportunistic feeder which subsists mainly on fish, which it swoops down and snatches from the water with its talons. It builds the largest nest of any North American bird and the largest tree nests ever recorded for any animal species, up to 4 m deep, 2.5 m wide, and 1 metric ton in weight. Sexual maturity is attained at the age of four to five years. Bald eagles can live up to 28 years in the wild and 36 years in captivity.',
   },
 
-  gorilla: {
+  [AnimalSlug.Gorilla]: {
     pageTitle:   'gorillas cams',
     camLabel:    'Gorilla cam',
     mainImage:   '../../images/youtubePlayer/gorillaBig.png',
@@ -83,10 +85,10 @@ const ANIMALS = {
     ],
     photo:       '../../images/youtubePlayer/gorillaBig.png',
     photoAlt:    'Western Lowland Gorilla',
-    description: 'The western lowland gorilla is the most numerous and widespread of all gorilla subspecies. Populations can be found in Cameroon, the Central African Republic, the Democratic Republic of Congo and Equatorial Guinea as well as in large areas in Gabon and the Republic of Congo. The large, powerful bodies of gorillas are covered in coarse, dark fur, except on the face, ears, hands, and feet. Older male gorillas are called silverbacks because of the distinctive patch of silver hair on their backs. A gorilla\'s arms are longer than its legs, and it tends to walk on all fours by curling its fingers inward and walking on the knuckles. Gorillas are primarily herbivorous, feeding on plants, fruits and seeds. They live in groups of 2 to 30 individuals led by a dominant silverback male.',
+    description: "The western lowland gorilla is the most numerous and widespread of all gorilla subspecies. Populations can be found in Cameroon, the Central African Republic, the Democratic Republic of Congo and Equatorial Guinea as well as in large areas in Gabon and the Republic of Congo. The large, powerful bodies of gorillas are covered in coarse, dark fur, except on the face, ears, hands, and feet. Older male gorillas are called silverbacks because of the distinctive patch of silver hair on their backs. A gorilla's arms are longer than its legs, and it tends to walk on all fours by curling its fingers inward and walking on the knuckles. Gorillas are primarily herbivorous, feeding on plants, fruits and seeds. They live in groups of 2 to 30 individuals led by a dominant silverback male.",
   },
 
-  lemur: {
+  [AnimalSlug.Lemur]: {
     pageTitle:   'lemur cams',
     camLabel:    'Ring-Tailed Lemur cam',
     mainImage:   '../../images/youtubePlayer/lemursBig.png',
@@ -114,8 +116,8 @@ const ANIMALS = {
   },
 };
 
-// ─── Helper: create element with className ────────────────────────────────────
-function el(tag, className) {
+// ─── Helper ───────────────────────────────────────────────────────────────────
+function el<K extends keyof HTMLElementTagNameMap>(tag: K, className?: string): HTMLElementTagNameMap[K] {
   const node = document.createElement(tag);
   if (className) node.className = className;
   return node;
@@ -123,18 +125,15 @@ function el(tag, className) {
 
 // ─── Section builders ─────────────────────────────────────────────────────────
 
-function buildLiveCams(data, slug) {
+function buildLiveCams(data: AnimalData, slug: string): HTMLElement {
   const section = el('section', 'live-cams');
 
-  // — Side nav
   const nav = document.createElement('live-cam-nav');
   nav.setAttribute('active', slug);
   section.appendChild(nav);
 
-  // — Content area
   const content = el('div', 'live-cams__content');
 
-  // Header row: title + donate button
   const header = el('div', 'live-cams__header');
   const title = el('h1', 'live-cams__title');
   title.textContent = data.pageTitle;
@@ -146,58 +145,54 @@ function buildLiveCams(data, slug) {
   });
   header.append(title, donateBtn);
 
-  // Main video
   const main = el('div', 'live-cams__main');
   const camLabel = el('span', 'live-cams__cam-label');
   camLabel.textContent = data.camLabel;
-  const bigImg = el('img', 'live-cams__big');
+  const bigImg = el('img', 'live-cams__big') as HTMLImageElement;
   bigImg.src = data.mainImage;
   bigImg.alt = data.mainAlt;
   main.append(camLabel, bigImg);
 
-  // "More live views" label
   const moreLabel = el('p', 'live-cams__more-label');
   moreLabel.textContent = 'more live views';
 
-  // Carousel
   const carousel = el('div', 'live-cams__carousel');
   const prevBtn = el('button', 'live-cams__prev');
   prevBtn.type = 'button';
   prevBtn.setAttribute('aria-label', 'Previous cam');
-  prevBtn.textContent = '\u2039'; // ‹
+  prevBtn.textContent = '\u2039';
 
-  const thumbs = el('div', 'live-cams__thumbs');
+  const thumbsContainer = el('div', 'live-cams__thumbs');
   for (const thumb of data.thumbs) {
     const thumbDiv = el('div', 'live-cams__thumb' + (thumb.active ? ' live-cams__thumb--active' : ''));
     const thumbLabel = el('span', 'live-cams__thumb-label');
-    thumbLabel.textContent = thumb.label + ' \uD83D\uDD12'; // 🔒
-    const thumbImg = el('img', '');
+    thumbLabel.textContent = thumb.label + ' \uD83D\uDD12';
+    const thumbImg = el('img') as HTMLImageElement;
     thumbImg.src = thumb.src;
     thumbImg.alt = thumb.alt;
     thumbDiv.append(thumbLabel, thumbImg);
-    thumbs.appendChild(thumbDiv);
+    thumbsContainer.appendChild(thumbDiv);
   }
 
   const nextBtn = el('button', 'live-cams__next');
   nextBtn.type = 'button';
   nextBtn.setAttribute('aria-label', 'Next cam');
-  nextBtn.textContent = '\u203A'; // ›
+  nextBtn.textContent = '\u203A';
 
-  carousel.append(prevBtn, thumbs, nextBtn);
+  carousel.append(prevBtn, thumbsContainer, nextBtn);
 
-  // — Carousel click logic
   let activeThumbIndex = 0;
-  const thumbEls = Array.from(thumbs.children);
+  const thumbEls = Array.from(thumbsContainer.children) as HTMLElement[];
 
-  function updateCarousel(newIndex) {
+  const updateCarousel = (newIndex: number): void => {
     thumbEls[activeThumbIndex].classList.remove('live-cams__thumb--active');
     activeThumbIndex = newIndex;
     thumbEls[activeThumbIndex].classList.add('live-cams__thumb--active');
     prevBtn.disabled = activeThumbIndex === 0;
     nextBtn.disabled = activeThumbIndex === thumbEls.length - 1;
-  }
+  };
 
-  prevBtn.disabled = true; // starts at index 0
+  prevBtn.disabled = true;
   prevBtn.addEventListener('click', () => {
     if (activeThumbIndex > 0) updateCarousel(activeThumbIndex - 1);
   });
@@ -205,7 +200,6 @@ function buildLiveCams(data, slug) {
     if (activeThumbIndex < thumbEls.length - 1) updateCarousel(activeThumbIndex + 1);
   });
 
-  // Mobile donate CTA
   const donateCta = el('button', 'live-cams__donate-cta');
   donateCta.type = 'button';
   donateCta.textContent = 'donate now';
@@ -218,7 +212,7 @@ function buildLiveCams(data, slug) {
   return section;
 }
 
-function buildPayFeed(data) {
+function buildPayFeed(data: AnimalData): HTMLElement {
   const section = el('section', 'pay-feed');
 
   const text = el('div', 'pay-feed__text');
@@ -235,7 +229,7 @@ function buildPayFeed(data) {
   const input = document.createElement('zoo-input');
   input.setAttribute('placeholder', '$ donation amount');
   const btn = document.createElement('amount-btn');
-  btn.setAttribute('label', '\u2192'); // →
+  btn.setAttribute('label', '\u2192');
   inputRow.append(input, btn);
   quickDonate.append(quickLabel, inputRow);
 
@@ -243,10 +237,9 @@ function buildPayFeed(data) {
   return section;
 }
 
-function buildDidYouKnow(data) {
+function buildDidYouKnow(data: AnimalData): HTMLElement {
   const section = el('section', 'did-you-know');
 
-  // Fact card
   const card = el('div', 'did-you-know__card');
   const cardTitle = el('h2', 'did-you-know__title');
   cardTitle.textContent = 'did you know?';
@@ -254,16 +247,15 @@ function buildDidYouKnow(data) {
   fact.textContent = data.didFact;
   card.append(cardTitle, fact);
 
-  // Profile row
   const profile = el('div', 'did-you-know__profile');
   const dl = el('dl', 'did-you-know__info');
   for (const row of data.info) {
-    const dt = el('dt', '');
+    const dt = el('dt');
     dt.textContent = row.dt;
-    const dd = el('dd', '');
+    const dd = el('dd');
     if (row.dt === 'Range:') {
-      dd.textContent = row.dd + '\u00A0'; // non-breaking space before link
-      const mapLink = el('a', 'did-you-know__map-link');
+      dd.textContent = row.dd + '\u00A0';
+      const mapLink = el('a', 'did-you-know__map-link') as HTMLAnchorElement;
       mapLink.href = '../map/index.html';
       mapLink.textContent = 'view map';
       dd.appendChild(mapLink);
@@ -273,12 +265,11 @@ function buildDidYouKnow(data) {
     dl.append(dt, dd);
   }
 
-  const photo = el('img', 'did-you-know__photo');
+  const photo = el('img', 'did-you-know__photo') as HTMLImageElement;
   photo.src = data.photo;
   photo.alt = data.photoAlt;
   profile.append(dl, photo);
 
-  // Description
   const desc = el('p', 'did-you-know__description');
   desc.textContent = data.description;
 
@@ -289,32 +280,35 @@ function buildDidYouKnow(data) {
 // ─── Component ────────────────────────────────────────────────────────────────
 
 export class AnimalPage extends HTMLElement {
-  static get observedAttributes() { return ['slug']; }
+  static get observedAttributes(): string[] { return ['slug']; }
 
-  connectedCallback() {
+  connectedCallback(): void {
     if (this.shadowRoot) return;
     this.attachShadow({ mode: 'open' });
-    const style = el('style', '');
+    const style = el('style');
     style.textContent = styles;
-    this.shadowRoot.appendChild(style);
-    this._render(this.getAttribute('slug') || 'panda');
+    this.shadowRoot!.appendChild(style);
+    this._render(this.getAttribute('slug') ?? AnimalSlug.Panda);
   }
 
-  attributeChangedCallback(name, _old, newVal) {
+  attributeChangedCallback(name: string, _old: string | null, newVal: string | null): void {
     if (name === 'slug' && this.shadowRoot) {
       const style = this.shadowRoot.querySelector('style');
-      this.shadowRoot.replaceChildren(style);
-      this._render(newVal || 'panda');
+      this.shadowRoot.replaceChildren(style!);
+      this._render(newVal ?? AnimalSlug.Panda);
     }
   }
 
-  _render(slug) {
-    const data = ANIMALS[slug] || ANIMALS.panda;
-    this.shadowRoot.appendChild(buildLiveCams(data, slug));
-    this.shadowRoot.appendChild(buildPayFeed(data));
-    this.shadowRoot.appendChild(buildDidYouKnow(data));
+  private _render(slug: string): void {
+    const data = ANIMALS[slug as AnimalSlug] ?? ANIMALS[AnimalSlug.Panda];
+    this.shadowRoot!.appendChild(buildLiveCams(data, slug));
+    this.shadowRoot!.appendChild(buildPayFeed(data));
+    this.shadowRoot!.appendChild(buildDidYouKnow(data));
   }
 }
 
 customElements.define('animal-page', AnimalPage);
 export default AnimalPage;
+
+// Satisfy compiler — imported but inferred types used
+export type { AnimalThumb, AnimalInfo };

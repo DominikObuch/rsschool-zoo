@@ -2,7 +2,7 @@ import styles from './animal-card.scss?inline';
 
 const template = document.createElement('template');
 
-function buildTemplate() {
+function buildTemplate(): void {
   const link = document.createElement('a');
   link.className = 'animal-card';
 
@@ -39,11 +39,11 @@ function buildTemplate() {
 buildTemplate();
 
 export class AnimalCard extends HTMLElement {
-  static get observedAttributes() {
+  static get observedAttributes(): string[] {
     return ['nickname', 'species', 'description', 'image', 'href'];
   }
 
-  connectedCallback() {
+  connectedCallback(): void {
     if (this.shadowRoot) return;
     const shadow = this.attachShadow({ mode: 'open' });
 
@@ -55,31 +55,31 @@ export class AnimalCard extends HTMLElement {
     this._applyAttrs();
   }
 
-  attributeChangedCallback() {
+  attributeChangedCallback(): void {
     this._applyAttrs();
   }
 
-  _applyAttrs() {
+  private _applyAttrs(): void {
     if (!this.shadowRoot) return;
     const root = this.shadowRoot;
 
-    const link        = root.querySelector('.animal-card');
-    const img         = root.querySelector('.animal-card__image');
-    const badge       = root.querySelector('.animal-card__badge');
-    const speciesEl   = root.querySelector('.animal-card__species');
-    const descEl      = root.querySelector('.animal-card__description');
+    const link = root.querySelector<HTMLAnchorElement>('.animal-card');
+    const img = root.querySelector<HTMLImageElement>('.animal-card__image');
+    const badge = root.querySelector('.animal-card__badge');
+    const speciesEl = root.querySelector('.animal-card__species');
+    const descEl = root.querySelector('.animal-card__description');
 
-    const href        = this.getAttribute('href') || '../zoo/index.html';
-    const nickname    = this.getAttribute('nickname') || '';
-    const species     = this.getAttribute('species') || '';
+    const href = this.getAttribute('href') || '../zoo/index.html';
+    const nickname = this.getAttribute('nickname') || '';
+    const species = this.getAttribute('species') || '';
     const description = this.getAttribute('description') || '';
-    const image       = this.getAttribute('image') || '';
+    const image = this.getAttribute('image') || '';
 
-    if (link)      link.href = href;
-    if (img)       { img.src = image; img.alt = species; }
-    if (badge)     badge.textContent = nickname;
+    if (link) link.href = href;
+    if (img) { img.src = image; img.alt = species; }
+    if (badge) badge.textContent = nickname;
     if (speciesEl) speciesEl.textContent = species;
-    if (descEl)    descEl.textContent = description;
+    if (descEl) descEl.textContent = description;
   }
 }
 

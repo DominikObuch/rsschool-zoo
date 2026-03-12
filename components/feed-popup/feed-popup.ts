@@ -1,13 +1,13 @@
 import styles from './feed-popup.scss?inline';
-import '../amount-btn/amount-btn.js';
+import '../amount-btn/amount-btn.ts';
 
 // ─── <feed-popup> ─────────────────────────────────────────────────────────────
 // 3-step donation modal.
 // API:  feedPopup.open(step?)  feedPopup.close()  feedPopup.setAmount(v)
 
-const AMOUNTS_STEP1 = ['$10', '$20', '$30', '$50', '$80', '$100'];
+const AMOUNTS_STEP1: string[] = ['$10', '$20', '$30', '$50', '$80', '$100'];
 
-const ANIMALS = [
+const ANIMALS: string[] = [
   'Lukas the Panda',
   'Andy the Lemur',
   'Glen the Gorilla',
@@ -18,13 +18,13 @@ const ANIMALS = [
   'Senja the Tiger',
 ];
 
-function el(tag, cls) {
+function el<K extends keyof HTMLElementTagNameMap>(tag: K, cls?: string): HTMLElementTagNameMap[K] {
   const e = document.createElement(tag);
   if (cls) e.className = cls;
   return e;
 }
 
-function buildDots(activeStep) {
+function buildDots(activeStep: number): HTMLDivElement {
   const wrap = el('div', 'feed-popup__dots');
   for (let i = 1; i <= 3; i++) {
     const dot = el('span', 'feed-popup__dot');
@@ -35,8 +35,7 @@ function buildDots(activeStep) {
   return wrap;
 }
 
-// ─── Step 1 ───────────────────────────────────────────────────────────────────
-function buildStep1() {
+function buildStep1(): HTMLDivElement {
   const step = el('div', 'feed-popup__step');
   step.dataset.step = '1';
 
@@ -49,7 +48,7 @@ function buildStep1() {
   amountLabel.textContent = 'Choose your donation amount:';
 
   const amounts = el('div', 'feed-popup__amounts');
-  AMOUNTS_STEP1.forEach((label, i) => {
+  AMOUNTS_STEP1.forEach((label: string, i: number) => {
     const btn = document.createElement('zoo-amount-btn');
     btn.setAttribute('label', label);
     if (i === 0) btn.setAttribute('active', '');
@@ -88,7 +87,7 @@ function buildStep1() {
   dropHeader.append(headerSpan, chevron);
 
   const dropInner = el('div', 'feed-popup__dropdown-inner');
-  ANIMALS.forEach(name => {
+  ANIMALS.forEach((name: string) => {
     const item = el('div', 'feed-popup__dropdown-item');
     item.textContent = name;
     item.setAttribute('role', 'option');
@@ -122,8 +121,7 @@ function buildStep1() {
   return step;
 }
 
-// ─── Step 2 ───────────────────────────────────────────────────────────────────
-function buildStep2() {
+function buildStep2(): HTMLDivElement {
   const step = el('div', 'feed-popup__step');
   step.dataset.step = '2';
 
@@ -157,8 +155,8 @@ function buildStep2() {
   nextBtn.dataset.action = 'next';
   const nextSpan = el('span');
   nextSpan.textContent = 'next';
-  const arrow = el('span', 'arrow');
-  nextBtn.append(nextSpan, arrow);
+  const arrowNext = el('span', 'arrow');
+  nextBtn.append(nextSpan, arrowNext);
 
   const backBtn = el('button', 'feed-popup__back-btn');
   backBtn.type = 'button';
@@ -173,8 +171,7 @@ function buildStep2() {
   return step;
 }
 
-// ─── Step 3 ───────────────────────────────────────────────────────────────────
-function buildStep3() {
+function buildStep3(): HTMLDivElement {
   const step = el('div', 'feed-popup__step');
   step.dataset.step = '3';
 
@@ -206,14 +203,17 @@ function buildStep3() {
   const monthSelect = el('select', 'feed-popup__select');
   monthSelect.setAttribute('name', 'exp-month');
   monthSelect.setAttribute('aria-label', 'Expiration month');
+
   const mPh = el('option');
   mPh.value = '';
   mPh.textContent = 'Month';
   mPh.disabled = true;
   mPh.selected = true;
   monthSelect.appendChild(mPh);
-  ['January','February','March','April','May','June','July','August','September','October','November','December']
-    .forEach((m, i) => {
+
+  ['January', 'February', 'March', 'April', 'May', 'June',
+   'July', 'August', 'September', 'October', 'November', 'December']
+    .forEach((m: string, i: number) => {
       const opt = el('option');
       opt.value = String(i + 1).padStart(2, '0');
       opt.textContent = m;
@@ -223,12 +223,14 @@ function buildStep3() {
   const yearSelect = el('select', 'feed-popup__select');
   yearSelect.setAttribute('name', 'exp-year');
   yearSelect.setAttribute('aria-label', 'Expiration year');
+
   const yPh = el('option');
   yPh.value = '';
   yPh.textContent = 'Year';
   yPh.disabled = true;
   yPh.selected = true;
   yearSelect.appendChild(yPh);
+
   const currentYear = new Date().getFullYear();
   for (let y = currentYear; y <= currentYear + 10; y++) {
     const opt = el('option');
@@ -248,8 +250,8 @@ function buildStep3() {
   completeBtn.dataset.action = 'complete';
   const completeSpan = el('span');
   completeSpan.textContent = 'complete donation';
-  const arrow = el('span', 'arrow');
-  completeBtn.append(completeSpan, arrow);
+  const arrowComplete = el('span', 'arrow');
+  completeBtn.append(completeSpan, arrowComplete);
 
   const backBtn = el('button', 'feed-popup__back-btn');
   backBtn.type = 'button';
@@ -264,10 +266,9 @@ function buildStep3() {
   return step;
 }
 
-// ─── Template ─────────────────────────────────────────────────────────────────
 const template = document.createElement('template');
 
-function buildTemplate() {
+function buildTemplate(): void {
   const backdrop = el('div', 'feed-popup__backdrop');
   const card = el('div', 'feed-popup__card');
 
@@ -283,9 +284,14 @@ function buildTemplate() {
 
 buildTemplate();
 
-// ─── Component Class ──────────────────────────────────────────────────────────
 export class FeedPopup extends HTMLElement {
-  connectedCallback() {
+  private _root: HTMLDivElement | null = null;
+  private _step: number = 1;
+  private readonly _onKeydown: (e: KeyboardEvent) => void = (e: KeyboardEvent) => {
+    if (e.key === 'Escape') this.close();
+  };
+
+  connectedCallback(): void {
     if (this.shadowRoot) return;
 
     const shadow = this.attachShadow({ mode: 'open' });
@@ -298,100 +304,104 @@ export class FeedPopup extends HTMLElement {
 
     root.appendChild(template.content.cloneNode(true));
 
-    // ── Amount toggle (Step 1) ──────────────────────────────────────────────
-    const step1 = root.querySelector('[data-step="1"]');
-    const amountBtns = Array.from(step1.querySelectorAll('.feed-popup__amounts zoo-amount-btn'));
-    const otherAmountBtn = step1.querySelector('.feed-popup__other zoo-amount-btn');
+    const step1 = root.querySelector<HTMLElement>('[data-step="1"]');
+    if (step1) {
+      const amountBtns = Array.from(step1.querySelectorAll<HTMLElement>('.feed-popup__amounts zoo-amount-btn'));
+      const otherAmountBtn = step1.querySelector<HTMLElement>('.feed-popup__other zoo-amount-btn');
 
-    function clearActive() {
-      amountBtns.forEach(b => b.removeAttribute('active'));
-      otherAmountBtn.removeAttribute('active');
+      const clearActive = (): void => {
+        amountBtns.forEach((b) => b.removeAttribute('active'));
+        otherAmountBtn?.removeAttribute('active');
+      };
+
+      amountBtns.forEach((btn) => {
+        btn.addEventListener('amount-select', () => {
+          clearActive();
+          btn.setAttribute('active', '');
+        });
+      });
+
+      otherAmountBtn?.addEventListener('amount-select', () => {
+        clearActive();
+        otherAmountBtn.setAttribute('active', '');
+        step1.querySelector<HTMLInputElement>('.feed-popup__other input')?.focus();
+      });
+
+      const specialBtn = step1.querySelector<HTMLElement>('.feed-popup__special-pet-btn');
+      const dropdown = step1.querySelector<HTMLElement>('.feed-popup__dropdown');
+      const headerSpan = dropdown?.querySelector<HTMLElement>('.feed-popup__dropdown-header span');
+
+      specialBtn?.addEventListener('click', () => {
+        dropdown?.classList.toggle('feed-popup__dropdown--open');
+      });
+
+      dropdown?.querySelectorAll<HTMLElement>('.feed-popup__dropdown-item').forEach((item) => {
+        item.addEventListener('click', () => {
+          dropdown.querySelectorAll('.feed-popup__dropdown-item')
+            .forEach((i) => i.classList.remove('feed-popup__dropdown-item--selected'));
+          item.classList.add('feed-popup__dropdown-item--selected');
+          if (headerSpan) headerSpan.textContent = item.textContent;
+          if (headerSpan) headerSpan.style.opacity = '1';
+          dropdown.classList.remove('feed-popup__dropdown--open');
+        });
+      });
+
+      root.addEventListener('click', (e: Event) => {
+        const target = e.target as Node | null;
+        if (
+          specialBtn && dropdown &&
+          !specialBtn.contains(target) &&
+          !dropdown.contains(target)
+        ) {
+          dropdown.classList.remove('feed-popup__dropdown--open');
+        }
+      });
     }
 
-    amountBtns.forEach(btn => {
-      btn.addEventListener('amount-select', () => {
-        clearActive();
-        btn.setAttribute('active', '');
-      });
-    });
-
-    otherAmountBtn.addEventListener('amount-select', () => {
-      clearActive();
-      otherAmountBtn.setAttribute('active', '');
-      step1.querySelector('.feed-popup__other input').focus();
-    });
-
-    // ── FOR SPECIAL PET dropdown ────────────────────────────────────────────
-    const specialBtn = step1.querySelector('.feed-popup__special-pet-btn');
-    const dropdown = step1.querySelector('.feed-popup__dropdown');
-    const headerSpan = dropdown.querySelector('.feed-popup__dropdown-header span');
-
-    specialBtn.addEventListener('click', () => {
-      dropdown.classList.toggle('feed-popup__dropdown--open');
-    });
-
-    Array.from(dropdown.querySelectorAll('.feed-popup__dropdown-item')).forEach(item => {
-      item.addEventListener('click', () => {
-        Array.from(dropdown.querySelectorAll('.feed-popup__dropdown-item'))
-          .forEach(i => i.classList.remove('feed-popup__dropdown-item--selected'));
-        item.classList.add('feed-popup__dropdown-item--selected');
-        headerSpan.textContent = item.textContent;
-        headerSpan.style.opacity = '1';
-        dropdown.classList.remove('feed-popup__dropdown--open');
-      });
-    });
-
-    root.addEventListener('click', (e) => {
-      if (!specialBtn.contains(e.target) && !dropdown.contains(e.target)) {
-        dropdown.classList.remove('feed-popup__dropdown--open');
-      }
-    });
-
-    // ── Step navigation ───────────────────────────────────────────────────
-    root.addEventListener('click', (e) => {
-      const action = e.target.closest('[data-action]')?.dataset.action;
+    root.addEventListener('click', (e: Event) => {
+      const target = e.target as HTMLElement | null;
+      const actionEl = target?.closest<HTMLElement>('[data-action]');
+      const action = actionEl?.dataset.action;
       if (!action) return;
       if (action === 'next' && this._step < 3) this._goTo(this._step + 1);
       else if (action === 'back' && this._step > 1) this._goTo(this._step - 1);
       else if (action === 'complete') this.close();
     });
 
-    // ── Backdrop click ────────────────────────────────────────────────────
-    root.querySelector('.feed-popup__backdrop').addEventListener('click', (e) => {
+    root.querySelector('.feed-popup__backdrop')?.addEventListener('click', (e: Event) => {
       if (e.target === root.querySelector('.feed-popup__backdrop')) this.close();
     });
 
-    this._onKeydown = (e) => { if (e.key === 'Escape') this.close(); };
     this._root = root;
     this._step = 1;
   }
 
-  _goTo(n) {
+  private _goTo(n: number): void {
     if (!this._root) return;
     this._root.querySelectorAll('.feed-popup__step')
-      .forEach(s => s.classList.remove('feed-popup__step--active'));
-    const target = this._root.querySelector(`[data-step="${n}"]`);
+      .forEach((s) => s.classList.remove('feed-popup__step--active'));
+    const target = this._root.querySelector<HTMLElement>(`[data-step="${n}"]`);
     if (target) target.classList.add('feed-popup__step--active');
     this._step = n;
   }
 
-  open(step = 1) {
-    if (!this.shadowRoot) return;
+  open(step: number = 1): void {
+    if (!this.shadowRoot || !this._root) return;
     this._goTo(step);
     this._root.classList.add('feed-popup--open');
     document.body.style.overflow = 'hidden';
     document.addEventListener('keydown', this._onKeydown);
   }
 
-  close() {
+  close(): void {
     if (!this._root) return;
     this._root.classList.remove('feed-popup--open');
     document.body.style.overflow = '';
     document.removeEventListener('keydown', this._onKeydown);
   }
 
-  setAmount(value) {
-    const input = this.shadowRoot?.querySelector('.feed-popup__other input');
+  setAmount(value: string): void {
+    const input = this.shadowRoot?.querySelector<HTMLInputElement>('.feed-popup__other input');
     if (input) input.value = value;
   }
 }

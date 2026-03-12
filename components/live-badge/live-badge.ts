@@ -2,11 +2,10 @@ import styles from './live-badge.scss?inline';
 
 const template = document.createElement('template');
 
-function buildTemplate() {
+function buildTemplate(): void {
   const button = document.createElement('button');
   button.className = 'live-badge';
 
-  // Camera icon — inline SVG built with createElementNS (no camera file in /public/icons)
   const svgNS = 'http://www.w3.org/2000/svg';
   const svg = document.createElementNS(svgNS, 'svg');
   svg.setAttribute('class', 'live-badge__icon');
@@ -14,7 +13,6 @@ function buildTemplate() {
   svg.setAttribute('fill', 'currentColor');
   svg.setAttribute('aria-hidden', 'true');
 
-  // Camera body rect
   const rect = document.createElementNS(svgNS, 'rect');
   rect.setAttribute('x', '1');
   rect.setAttribute('y', '6');
@@ -22,14 +20,12 @@ function buildTemplate() {
   rect.setAttribute('height', '12');
   rect.setAttribute('rx', '2');
 
-  // Camera lens circle
   const circle = document.createElementNS(svgNS, 'circle');
   circle.setAttribute('cx', '8.5');
   circle.setAttribute('cy', '12');
   circle.setAttribute('r', '3');
   circle.setAttribute('fill', '#F58021');
 
-  // Video triangle
   const poly = document.createElementNS(svgNS, 'polygon');
   poly.setAttribute('points', '16,9 23,6 23,18 16,15');
 
@@ -50,7 +46,7 @@ function buildTemplate() {
 buildTemplate();
 
 export class ZooLiveBadge extends HTMLElement {
-  connectedCallback() {
+  connectedCallback(): void {
     if (this.shadowRoot) return;
     const shadow = this.attachShadow({ mode: 'open' });
 
@@ -60,9 +56,9 @@ export class ZooLiveBadge extends HTMLElement {
 
     shadow.appendChild(template.content.cloneNode(true));
 
-    shadow.querySelector('.live-badge').addEventListener('click', () => {
+    shadow.querySelector('.live-badge')?.addEventListener('click', () => {
       this.dispatchEvent(new CustomEvent('live-badge-click', {
-        bubbles:  true,
+        bubbles: true,
         composed: true,
       }));
     });

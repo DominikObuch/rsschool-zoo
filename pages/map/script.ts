@@ -1,9 +1,9 @@
 import '../../src/styles/main.scss';
 import './map.scss';
-import '../../components/donate-popup/donate-popup.js';
+import type { DonatePopup } from '../../components/donate-popup/donate-popup.ts';
 
 document.addEventListener('DOMContentLoaded', () => {
-  const donatePopup = document.getElementById('donate-popup');
+  const donatePopup = document.getElementById('donate-popup') as DonatePopup | null;
   document.addEventListener('donate-click', () => {
     donatePopup?.open();
   });

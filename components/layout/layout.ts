@@ -1,19 +1,10 @@
 import styles from './layout.scss?inline';
-import '../header/header.js';   // registers <zoo-header>
-import '../footer/footer.js';   // registers <zoo-footer>
-
-// ─── <zoo-layout> ─────────────────────────────────────────────────────────────
-// Attributes:
-//   active – forwarded to <zoo-header active="…"> to highlight the right nav item
-//
-// Usage:
-//   <zoo-layout active="landing">
-//     <section class="hero"> … </section>
-//   </zoo-layout>
+import '../header/header.ts';
+import '../footer/footer.ts';
 
 const template = document.createElement('template');
 
-function buildTemplate() {
+function buildTemplate(): void {
   const wrapper = document.createElement('div');
   wrapper.className = 'layout';
 
@@ -21,7 +12,7 @@ function buildTemplate() {
 
   const main = document.createElement('main');
   main.className = 'layout__main';
-  const slot = document.createElement('slot'); // slotted page content
+  const slot = document.createElement('slot');
   main.appendChild(slot);
 
   const footer = document.createElement('zoo-footer');
@@ -33,9 +24,9 @@ function buildTemplate() {
 buildTemplate();
 
 export class ZooLayout extends HTMLElement {
-  static get observedAttributes() { return ['active']; }
+  static get observedAttributes(): string[] { return ['active']; }
 
-  connectedCallback() {
+  connectedCallback(): void {
     if (this.shadowRoot) return;
 
     const shadow = this.attachShadow({ mode: 'open' });
@@ -48,11 +39,11 @@ export class ZooLayout extends HTMLElement {
     this._forwardActive(this.getAttribute('active'));
   }
 
-  attributeChangedCallback(name, _old, newVal) {
+  attributeChangedCallback(name: string, _old: string | null, newVal: string | null): void {
     if (name === 'active') this._forwardActive(newVal);
   }
 
-  _forwardActive(page) {
+  private _forwardActive(page: string | null): void {
     const header = this.shadowRoot?.querySelector('zoo-header');
     if (header && page) header.setAttribute('active', page);
   }
