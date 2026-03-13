@@ -89,7 +89,12 @@ export class ZooSlider extends HTMLElement {
   private _go(dir: number): void {
     const { perPage } = this._layout();
     const pages = Math.ceil(this._cards().length / perPage);
-    this.#page = Math.max(0, Math.min(this.#page + dir, pages - 1));
+    if (pages <= 0) {
+      this.#page = 0;
+      this._update();
+      return;
+    }
+    this.#page = (this.#page + dir + pages) % pages;
     this._update();
   }
 
@@ -111,8 +116,8 @@ export class ZooSlider extends HTMLElement {
       this._grid.style.setProperty('--slider-cols', String(cols));
     }
 
-    if (this._prevBtn) this._prevBtn.disabled = this.#page === 0;
-    if (this._nextBtn) this._nextBtn.disabled = this.#page >= pages - 1;
+    if (this._prevBtn) this._prevBtn.disabled = pages <= 1;
+    if (this._nextBtn) this._nextBtn.disabled = pages <= 1;
   }
 }
 

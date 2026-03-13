@@ -110,7 +110,22 @@
     &:focus {
       border-color: darken($color-turquoise, 10%);
     }
+
+    &.feed-popup__field--error {
+      border-color: $color-orange;
+    }
   }
+}
+
+.feed-popup__saved-cards {
+  margin-bottom: 14px;
+}
+
+.feed-popup__saved-cards-label {
+  display: block;
+  font-size: 0.8125rem;
+  color: $color-navy;
+  margin-bottom: 8px;
 }
 
 // ─── For Special Pet button ───────────────────────────────────────────────────
@@ -291,6 +306,33 @@
   &:focus {
     border-color: color.adjust($color-turquoise, $lightness: -10%);
   }
+
+  &--error {
+    border-color: $color-orange;
+  }
+}
+
+.feed-popup__message {
+  display: none;
+  margin: 0 0 12px;
+  font-size: 0.8125rem;
+  line-height: 1.4;
+
+  &--visible {
+    display: block;
+  }
+
+  &--error {
+    color: $color-orange;
+  }
+
+  &--success {
+    color: $color-turquoise;
+  }
+}
+
+.feed-popup__save-card-row {
+  margin-bottom: 14px;
 }
 
 // ─── Step indicator (dots) ────────────────────────────────────────────────────

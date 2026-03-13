@@ -1198,3 +1198,34 @@
     }
   }
 }
+
+.landing-loader,
+.landing-error {
+  width: 100%;
+  min-height: 220px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  font-family: $font-family-base;
+  font-weight: $font-weight-bold;
+  font-size: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.landing-loader {
+  color: $color-turquoise;
+}
+
+.landing-error {
+  color: $color-white;
+  text-transform: none;
+  text-align: center;
+  background-color: rgba($color-black, 0.32);
+}
+
+.pets .landing-error {
+  color: $color-navy;
+  background-color: rgba($color-turquoise, 0.12);
+}

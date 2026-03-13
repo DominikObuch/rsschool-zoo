@@ -8,6 +8,29 @@
   width: 100%;
 }
 
+.animal-page__loader,
+.animal-page__error {
+  min-height: 320px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: $font-family-base;
+  font-weight: $font-weight-bold;
+  font-size: 1rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 24px;
+}
+
+.animal-page__loader {
+  color: $color-turquoise;
+}
+
+.animal-page__error {
+  color: $color-orange;
+  text-transform: none;
+}
+
 // ─── Live Cams ────────────────────────────────────────────────────────────────
 
 .live-cams {
@@ -406,6 +429,9 @@
     gap:             6px;
     cursor:          pointer;
     transition:      opacity $transition-base;
+    border:          none;
+    background:      transparent;
+    padding:         0;
 
     &::after {
       @include arrow-svg(14px, 12px);
@@ -481,5 +507,80 @@
     &__title { font-size: 1.375rem; }
 
     &__photo { height: 200px; }
+  }
+}
+
+.map-modal {
+  position: fixed;
+  inset: 0;
+  background-color: rgba($color-black, 0.65);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 30;
+  padding: 16px;
+
+  &--open {
+    display: flex;
+  }
+
+  &__panel {
+    width: min(760px, 100%);
+    background-color: $color-white;
+    border-radius: 6px;
+    padding: 24px;
+    position: relative;
+  }
+
+  &__close {
+    position: absolute;
+    right: 12px;
+    top: 12px;
+    border: none;
+    background: none;
+    color: $color-navy;
+    font-size: 1.25rem;
+    cursor: pointer;
+  }
+
+  &__title {
+    margin: 0 0 16px;
+    font-family: $font-family-base;
+    font-weight: $font-weight-bold;
+    font-size: 1.5rem;
+    color: $color-turquoise;
+    text-transform: uppercase;
+  }
+
+  &__map {
+    position: relative;
+    --pin-x: 50%;
+    --pin-y: 50%;
+  }
+
+  &__image {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  &__pin {
+    position: absolute;
+    left: var(--pin-x);
+    top: var(--pin-y);
+    transform: translate(-50%, -100%);
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    border: 2px solid $color-white;
+    background-color: $color-orange;
+    cursor: default;
+  }
+
+  &__coords {
+    margin: 12px 0 0;
+    font-family: $font-family-base;
+    font-size: 0.875rem;
+    color: $color-navy;
   }
 }

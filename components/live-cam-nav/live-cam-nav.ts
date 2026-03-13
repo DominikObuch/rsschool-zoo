@@ -1,11 +1,15 @@
 import styles from './live-cam-nav.scss?inline';
 import type { AnimalNavItem } from '../../src/types.ts';
 
-const ANIMALS: AnimalNavItem[] = [
-  { slug: 'panda',   icon: '../../icons/Panda.svg',   label: "Watch live from China's Panda Center",          href: '../../pages/panda/index.html' },
-  { slug: 'eagle',   icon: '../../icons/Eagle.svg',   label: 'The Bald Eagles Nest from West End cam',        href: '../../pages/eagle/index.html' },
-  { slug: 'gorilla', icon: '../../icons/Gorilla.svg', label: 'Live from Gorilla Forest Corridor habitat cam', href: '../../pages/gorilla/index.html' },
-  { slug: 'lemur',   icon: '../../icons/Lemur.svg',   label: 'Lemurs play in Madagascar, Lemuria …',          href: '../../pages/lemur/index.html' },
+interface CameraNavItem extends AnimalNavItem {
+  petId: number;
+}
+
+const DEFAULT_ITEMS: CameraNavItem[] = [
+  { slug: 'panda', icon: '../../icons/Panda.svg', label: "Watch live from China's Panda Center", href: '#', petId: 1 },
+  { slug: 'eagle', icon: '../../icons/Eagle.svg', label: 'The Bald Eagles Nest from West End cam', href: '#', petId: 2 },
+  { slug: 'gorilla', icon: '../../icons/Gorilla.svg', label: 'Live from Gorilla Forest Corridor habitat cam', href: '#', petId: 3 },
+  { slug: 'lemur', icon: '../../icons/Lemur.svg', label: 'Lemurs play in Madagascar, Lemuria ...', href: '#', petId: 4 },
 ];
 
 const template = document.createElement('template');
@@ -61,31 +65,6 @@ function buildTemplate(): void {
   const list = document.createElement('ul');
   list.className = 'live-cam-nav__list';
 
-  for (const animal of ANIMALS) {
-    const item = document.createElement('li');
-    item.className = 'live-cam-nav__item';
-    item.dataset.slug = animal.slug;
-
-    const iconWrap = document.createElement('div');
-    iconWrap.className = 'live-cam-nav__icon-wrap';
-
-    const img = document.createElement('img');
-    img.className = 'live-cam-nav__icon';
-    img.src = animal.icon;
-    img.alt = animal.slug;
-
-    iconWrap.appendChild(img);
-
-    const label = document.createElement('span');
-    label.className = 'live-cam-nav__label';
-    label.textContent = animal.label;
-
-    item.appendChild(iconWrap);
-    item.appendChild(label);
-    item.dataset.href = animal.href;
-    list.appendChild(item);
-  }
-
   const footer = document.createElement('div');
   footer.className = 'live-cam-nav__footer';
 
@@ -106,7 +85,9 @@ function buildTemplate(): void {
 buildTemplate();
 
 export class LiveCamNav extends HTMLElement {
-  static get observedAttributes(): string[] { return ['active']; }
+  static get observedAttributes(): string[] { return ['active-pet-id', 'items']; }
+
+  private _items: CameraNavItem[] = DEFAULT_ITEMS;
 
   connectedCallback(): void {
     if (this.shadowRoot) return;
@@ -129,24 +110,86 @@ export class LiveCamNav extends HTMLElement {
       btn.setAttribute('aria-label', isNowCollapsed ? 'Expand navigation' : 'Collapse navigation');
     });
 
-    shadow.querySelectorAll<HTMLElement>('.live-cam-nav__item').forEach((item) => {
-      item.addEventListener('click', () => {
-        const href = item.dataset.href;
-        if (href) window.location.href = href;
-      });
-    });
-
-    this._highlightActive(this.getAttribute('active'));
+    this._parseItems();
+    this._renderItems();
+    this._highlightActive(this.getAttribute('active-pet-id'));
   }
 
   attributeChangedCallback(name: string, _old: string | null, newVal: string | null): void {
-    if (name === 'active') this._highlightActive(newVal);
+    if (name === 'items') {
+      this._parseItems();
+      this._renderItems();
+      this._highlightActive(this.getAttribute('active-pet-id'));
+      return;
+    }
+    if (name === 'active-pet-id') this._highlightActive(newVal);
   }
 
-  private _highlightActive(slug: string | null): void {
+  private _parseItems(): void {
+    const raw = this.getAttribute('items');
+    if (!raw) {
+      this._items = DEFAULT_ITEMS;
+      return;
+    }
+
+    try {
+      const parsed = JSON.parse(raw) as CameraNavItem[];
+      if (!Array.isArray(parsed) || parsed.length === 0) {
+        this._items = DEFAULT_ITEMS;
+        return;
+      }
+      this._items = parsed.filter((item) => typeof item.petId === 'number' && Boolean(item.label));
+      if (this._items.length === 0) this._items = DEFAULT_ITEMS;
+    } catch {
+      this._items = DEFAULT_ITEMS;
+    }
+  }
+
+  private _renderItems(): void {
     if (!this.shadowRoot) return;
+    const list = this.shadowRoot.querySelector<HTMLElement>('.live-cam-nav__list');
+    if (!list) return;
+
+    list.replaceChildren();
+    for (const itemData of this._items) {
+      const item = document.createElement('li');
+      item.className = 'live-cam-nav__item';
+      item.dataset.slug = itemData.slug;
+      item.dataset.petId = String(itemData.petId);
+
+      const iconWrap = document.createElement('div');
+      iconWrap.className = 'live-cam-nav__icon-wrap';
+
+      const img = document.createElement('img');
+      img.className = 'live-cam-nav__icon';
+      img.src = itemData.icon;
+      img.alt = itemData.slug;
+
+      const label = document.createElement('span');
+      label.className = 'live-cam-nav__label';
+      label.textContent = itemData.label;
+
+      iconWrap.appendChild(img);
+      item.append(iconWrap, label);
+      item.addEventListener('click', () => {
+        const petId = Number(item.dataset.petId);
+        if (!Number.isFinite(petId)) return;
+        this.dispatchEvent(new CustomEvent('camera-select', {
+          bubbles: true,
+          composed: true,
+          detail: { petId },
+        }));
+      });
+
+      list.appendChild(item);
+    }
+  }
+
+  private _highlightActive(activePetId: string | null): void {
+    if (!this.shadowRoot) return;
+    const selected = Number(activePetId);
     this.shadowRoot.querySelectorAll<HTMLElement>('.live-cam-nav__item').forEach((item) => {
-      item.classList.toggle('live-cam-nav__item--active', item.dataset.slug === slug);
+      item.classList.toggle('live-cam-nav__item--active', Number(item.dataset.petId) === selected);
     });
   }
 }

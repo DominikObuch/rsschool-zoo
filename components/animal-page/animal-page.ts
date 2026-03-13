@@ -2,155 +2,146 @@ import styles from './animal-page.scss?inline';
 import '../live-cam-nav/live-cam-nav.ts';
 import '../zoo-input/zoo-input.ts';
 import '../amount-btn/amount-btn.ts';
-import type { AnimalData, AnimalThumb, AnimalInfo } from '../../src/types.ts';
 import { AnimalSlug } from '../../src/types.ts';
 import { getProductImagesBySlug } from '../../src/assets/product-images.ts';
+import { camerasService } from '../../src/api/services/cameras.service.ts';
+import { petsService } from '../../src/api/services/pets.service.ts';
+import { mapPetDetailedDtoToViewModel } from '../../src/api/mappers/pet.mapper.ts';
+import type { CameraDto } from '../../src/api/models/cameras.dto.ts';
+import type { PetDetailedViewModel } from '../../src/api/mappers/pet.mapper.ts';
 
-function buildCamThumbs(slug: AnimalSlug, altPrefix: string): AnimalThumb[] {
-  const { thumbs } = getProductImagesBySlug(slug);
-  return thumbs.map((src, index) => ({
-    src,
-    alt: `${altPrefix} cam ${index + 1}`,
-    label: `CAM ${index + 1}`,
-    active: index === 0,
-  }));
+const ERROR_TEXT = 'Something went wrong. Please, refresh the page';
+
+interface CameraNavItem {
+  id: number;
+  petId: number;
+  label: string;
+  slug: string;
+  icon: string;
 }
 
-const pandaImages = getProductImagesBySlug(AnimalSlug.Panda);
-const eagleImages = getProductImagesBySlug(AnimalSlug.Eagle);
-const gorillaImages = getProductImagesBySlug(AnimalSlug.Gorilla);
-const lemurImages = getProductImagesBySlug(AnimalSlug.Lemur);
+interface HeroData {
+  pageTitle: string;
+  camLabel: string;
+  mainImage: string;
+  mainAlt: string;
+  thumbs: string[];
+}
 
-// ─── Animal data ──────────────────────────────────────────────────────────────
-const ANIMALS: Record<AnimalSlug, AnimalData> = {
-  [AnimalSlug.Panda]: {
-    pageTitle:   'live panda cams',
-    camLabel:    'Lucas, the Giant Panda cam 1',
-    mainImage:   pandaImages.main,
-    mainAlt:     'Giant panda — Lucas, cam 1',
-    thumbs:      buildCamThumbs(AnimalSlug.Panda, 'Panda'),
-    feedTitle: 'make the bamboo donation!',
-    feedBody:  'Our process for bamboo donations first starts with a site evaluation. It is important that our team sees where the bamboo is growing, then determining if the bamboo is a species that our animals are currently eating. Thank you for your interest in donating bamboo for our pandas.',
-    didFact:   'Pandas are often seen eating in a relaxed sitting posture, with their hind legs stretched out before them. They may appear sedentary, but they are skilled tree-climbers and efficient swimmers.',
-    info: [
-      { dt: 'Common name:',     dd: 'Giant Panda' },
-      { dt: 'Scientific name:', dd: 'Ailuropoda melanoleuca' },
-      { dt: 'Type:',            dd: 'Herbivore' },
-      { dt: 'Size:',            dd: '4 to 5 feet' },
-      { dt: 'Diet:',            dd: 'Omnivore' },
-      { dt: 'Habitat:',         dd: 'Forests' },
-      { dt: 'Range:',           dd: 'Eastern Asia' },
-    ],
-    photo:       pandaImages.profile,
-    photoAlt:    'Giant Panda',
-    description: 'Giant pandas are very unusual animals that eat almost exclusively bamboo, which is very low in nutrients. Because of this, they have many unique adaptations for their low-energy lifestyle. Giant pandas are solitary. They have a highly developed sense of smell that males use to avoid each other and to find females for mating in the spring. After a five-month pregnancy, females give birth to a cub or two, though they cannot care for both twins. The blind infants weigh only 5 ounces at birth and cannot crawl until they reach three months of age. They are born white, and develop their much loved coloring later. Habitat loss is the primary threat to this species. Its popularity around the world has helped the giant panda become the focus of successful conservation programs.',
-  },
-
-  [AnimalSlug.Eagle]: {
-    pageTitle:   'bald eagle cams',
-    camLabel:    'Bald Eagle cam',
-    mainImage:   eagleImages.main,
-    mainAlt:     'Bald Eagle cam',
-    thumbs:      buildCamThumbs(AnimalSlug.Eagle, 'Eagle'),
-    feedTitle: 'keep the bald eagle cams streaming!',
-    feedBody:  'Watch as this lifelong pair of eagle parents lay and protect eggs, feed their chicks and teach them to hunt and fly. Sam & Lora — 100% of the donations from this page will be utilized directly for the streaming and operational costs of this project.',
-    didFact:   'Because of its role as a symbol of the US, but also because of its being a large predator, the bald eagle has many representations in popular culture. Not all of these representations are accurate. In particular, the movie or television bald eagle typically has a bold, powerful cry. The actual eagle has a much softer chirpy voice, not in keeping with its popular image.',
-    info: [
-      { dt: 'Common name:',     dd: 'Bald Eagle' },
-      { dt: 'Scientific name:', dd: 'Haliaeetus leucocephalus' },
-      { dt: 'Type:',            dd: 'Birds' },
-      { dt: 'Size:',            dd: 'Body: 34–43 in; wingspan: 6–8 ft' },
-      { dt: 'Diet:',            dd: 'Carnivore' },
-      { dt: 'Habitat:',         dd: 'Seacoasts, rivers, large lakes or marshes' },
-      { dt: 'Range:',           dd: 'Continental United States' },
-    ],
-    photo:       eagleImages.profile,
-    photoAlt:    'Bald Eagle',
-    description: 'The bald eagle is a bird of prey found in North America. A sea eagle, it has two known subspecies and forms a species pair with the white-tailed eagle. Its range includes most of Canada and Alaska, all of the contiguous United States, and northern Mexico. It is found near large bodies of open water with an abundant food supply and old-growth trees for nesting. The bald eagle is an opportunistic feeder which subsists mainly on fish, which it swoops down and snatches from the water with its talons. It builds the largest nest of any North American bird and the largest tree nests ever recorded for any animal species, up to 4 m deep, 2.5 m wide, and 1 metric ton in weight. Sexual maturity is attained at the age of four to five years. Bald eagles can live up to 28 years in the wild and 36 years in captivity.',
-  },
-
-  [AnimalSlug.Gorilla]: {
-    pageTitle:   'gorillas cams',
-    camLabel:    'Gorilla cam',
-    mainImage:   gorillaImages.main,
-    mainAlt:     'Gorilla cam',
-    thumbs:      buildCamThumbs(AnimalSlug.Gorilla, 'Gorilla'),
-    feedTitle: 'make a difference for the gorillas!',
-    feedBody:  'It is our goal to ensure the conservation and restoration of the gorilla population and their habitat in Central Africa. To do this, we need your help! Bring your food charity straight to Glen and his family.',
-    didFact:   'In addition to having distinctive fingerprints like humans do, gorillas also have unique nose prints. Gorillas are the largest of the great apes, but the western lowland gorilla is the smallest of the subspecies.',
-    info: [
-      { dt: 'Common name:',     dd: 'Western Lowland Gorilla' },
-      { dt: 'Scientific name:', dd: 'Gorilla gorilla gorilla' },
-      { dt: 'Type:',            dd: 'Mammals' },
-      { dt: 'Size:',            dd: 'Standing height: 4–6 feet' },
-      { dt: 'Diet:',            dd: 'Omnivore' },
-      { dt: 'Habitat:',         dd: 'Rainforests' },
-      { dt: 'Range:',           dd: 'Western Africa' },
-    ],
-    photo:       gorillaImages.profile,
-    photoAlt:    'Western Lowland Gorilla',
-    description: "The western lowland gorilla is the most numerous and widespread of all gorilla subspecies. Populations can be found in Cameroon, the Central African Republic, the Democratic Republic of Congo and Equatorial Guinea as well as in large areas in Gabon and the Republic of Congo. The large, powerful bodies of gorillas are covered in coarse, dark fur, except on the face, ears, hands, and feet. Older male gorillas are called silverbacks because of the distinctive patch of silver hair on their backs. A gorilla's arms are longer than its legs, and it tends to walk on all fours by curling its fingers inward and walking on the knuckles. Gorillas are primarily herbivorous, feeding on plants, fruits and seeds. They live in groups of 2 to 30 individuals led by a dominant silverback male.",
-  },
-
-  [AnimalSlug.Lemur]: {
-    pageTitle:   'lemur cams',
-    camLabel:    'Ring-Tailed Lemur cam',
-    mainImage:   lemurImages.main,
-    mainAlt:     'Ring-tailed lemur cam',
-    thumbs:      buildCamThumbs(AnimalSlug.Lemur, 'Lemur'),
-    feedTitle: 'provide andy the lemur with fruits!',
-    feedBody:  'More than 90% of lemur species are endangered and might face extinction in the nearest future. Watch the ring-tailed lemurs play and climb in this soothing setting and support them by donating for the fruits they adore.',
-    didFact:   'A ring-tailed lemur mob will gather in open areas of the forest to sunbathe. They sit in what some call a "yoga position" with their bellies toward the sun and their arms and legs stretched out to the sides.',
-    info: [
-      { dt: 'Common name:',     dd: 'Ring-Tailed Lemur' },
-      { dt: 'Scientific name:', dd: 'Lemur catta' },
-      { dt: 'Type:',            dd: 'Mammals' },
-      { dt: 'Size:',            dd: 'Head and body: 17.75 in; tail: 21.75 in' },
-      { dt: 'Diet:',            dd: 'Herbivore' },
-      { dt: 'Habitat:',         dd: 'Arid, open areas and forests' },
-      { dt: 'Range:',           dd: 'Madagascar' },
-    ],
-    photo:       lemurImages.profile,
-    photoAlt:    'Ring-Tailed Lemur',
-    description: 'Ring-tailed lemurs are named for the 13 alternating black and white bands that adorn their tails. Unlike most other lemurs, ringtails spend 40 percent of their time on the ground, moving quadrupedally along the forest floor. Ring-tailed lemurs live in southwestern Madagascar, in arid, open spaces and forests in territories that range from 15 to 57 acres. As with all lemurs, olfactory communication relies on scent glands on their wrists and chests that they use to mark their foraging routes. They can also eat fruit, herbs and small vertebrates. Females usually give birth to their first baby when they are three years old, and usually once a year every year after that. All adult females participate in raising the offspring of the group. The median life expectancy for a ring-tailed lemur is about 16 years.',
-  },
-};
-
-// ─── Helper ───────────────────────────────────────────────────────────────────
 function el<K extends keyof HTMLElementTagNameMap>(tag: K, className?: string): HTMLElementTagNameMap[K] {
   const node = document.createElement(tag);
   if (className) node.className = className;
   return node;
 }
 
-// ─── Section builders ─────────────────────────────────────────────────────────
+function parseCoord(value: string): number | null {
+  const parsed = Number(value);
+  if (!Number.isFinite(parsed)) return null;
+  return parsed;
+}
 
-function buildLiveCams(data: AnimalData, slug: string): HTMLElement {
+function toPercentPosition(latitude: string, longitude: string): { x: string; y: string } {
+  const lat = parseCoord(latitude);
+  const lon = parseCoord(longitude);
+
+  if (lat === null || lon === null) {
+    return { x: '50%', y: '50%' };
+  }
+
+  const x = Math.min(100, Math.max(0, ((lon + 180) / 360) * 100));
+  const y = Math.min(100, Math.max(0, ((90 - lat) / 180) * 100));
+
+  return {
+    x: `${x.toFixed(2)}%`,
+    y: `${y.toFixed(2)}%`,
+  };
+}
+
+function resolveSlug(value: string): string {
+  const normalized = value.toLowerCase();
+  if (normalized.includes('panda')) return AnimalSlug.Panda;
+  if (normalized.includes('eagle')) return AnimalSlug.Eagle;
+  if (normalized.includes('gorilla')) return AnimalSlug.Gorilla;
+  if (normalized.includes('lemur')) return AnimalSlug.Lemur;
+  return AnimalSlug.Panda;
+}
+
+function resolveIcon(slug: string): string {
+  if (slug === AnimalSlug.Eagle) return '../../icons/Eagle.svg';
+  if (slug === AnimalSlug.Gorilla) return '../../icons/Gorilla.svg';
+  if (slug === AnimalSlug.Lemur) return '../../icons/Lemur.svg';
+  return '../../icons/Panda.svg';
+}
+
+function toCameraNavItem(camera: CameraDto): CameraNavItem {
+  const slug = resolveSlug(camera.text);
+  return {
+    id: camera.id,
+    petId: camera.petId,
+    label: camera.text,
+    slug,
+    icon: resolveIcon(slug),
+  };
+}
+
+function buildHeroData(pet: PetDetailedViewModel, cameraLabel: string): HeroData {
+  const title = `live ${pet.commonName} cams`;
+  return {
+    pageTitle: title,
+    camLabel: cameraLabel,
+    mainImage: pet.images.main,
+    mainAlt: `${pet.commonName} main cam`,
+    thumbs: [...pet.images.thumbs],
+  };
+}
+
+function buildFallbackHeroData(slug: string): HeroData {
+  const resolvedSlug = resolveSlug(slug);
+  const images = getProductImagesBySlug(resolvedSlug as AnimalSlug);
+  return {
+    pageTitle: `live ${resolvedSlug} cams`,
+    camLabel: 'Main live cam',
+    mainImage: images.main,
+    mainAlt: 'Main live cam image',
+    thumbs: [...images.thumbs],
+  };
+}
+
+function buildLiveCams(hero: HeroData, navItems: CameraNavItem[], activePetId: number | null): HTMLElement {
   const section = el('section', 'live-cams');
 
   const nav = document.createElement('live-cam-nav');
-  nav.setAttribute('active', slug);
+  if (navItems.length > 0) {
+    nav.setAttribute('items', JSON.stringify(navItems));
+  }
+  if (activePetId !== null) {
+    nav.setAttribute('active-pet-id', String(activePetId));
+  }
   section.appendChild(nav);
 
   const content = el('div', 'live-cams__content');
 
   const header = el('div', 'live-cams__header');
   const title = el('h1', 'live-cams__title');
-  title.textContent = data.pageTitle;
+  title.textContent = hero.pageTitle;
+
   const donateBtn = el('button', 'live-cams__donate');
   donateBtn.type = 'button';
   donateBtn.textContent = 'donate now';
   donateBtn.addEventListener('click', () => {
     donateBtn.dispatchEvent(new CustomEvent('donate-click', { bubbles: true, composed: true }));
   });
+
   header.append(title, donateBtn);
 
   const main = el('div', 'live-cams__main');
   const camLabel = el('span', 'live-cams__cam-label');
-  camLabel.textContent = data.camLabel;
+  camLabel.textContent = hero.camLabel;
+
   const bigImg = el('img', 'live-cams__big') as HTMLImageElement;
-  bigImg.src = data.mainImage;
-  bigImg.alt = data.mainAlt;
+  bigImg.src = hero.mainImage;
+  bigImg.alt = hero.mainAlt;
+
   main.append(camLabel, bigImg);
 
   const moreLabel = el('p', 'live-cams__more-label');
@@ -160,44 +151,56 @@ function buildLiveCams(data: AnimalData, slug: string): HTMLElement {
   const prevBtn = el('button', 'live-cams__prev');
   prevBtn.type = 'button';
   prevBtn.setAttribute('aria-label', 'Previous cam');
-  prevBtn.textContent = '\u2039';
+  prevBtn.textContent = '<';
 
   const thumbsContainer = el('div', 'live-cams__thumbs');
-  for (const thumb of data.thumbs) {
-    const thumbDiv = el('div', 'live-cams__thumb' + (thumb.active ? ' live-cams__thumb--active' : ''));
+  const thumbEls: HTMLElement[] = [];
+
+  hero.thumbs.forEach((thumbSrc, index) => {
+    const thumb = el('div', 'live-cams__thumb' + (index === 0 ? ' live-cams__thumb--active' : ''));
     const thumbLabel = el('span', 'live-cams__thumb-label');
-    thumbLabel.textContent = thumb.label + ' \uD83D\uDD12';
+    thumbLabel.textContent = `cam ${index + 1} locked`;
+
     const thumbImg = el('img') as HTMLImageElement;
-    thumbImg.src = thumb.src;
-    thumbImg.alt = thumb.alt;
-    thumbDiv.append(thumbLabel, thumbImg);
-    thumbsContainer.appendChild(thumbDiv);
-  }
+    thumbImg.src = thumbSrc;
+    thumbImg.alt = `${hero.mainAlt} preview ${index + 1}`;
+
+    thumb.append(thumbLabel, thumbImg);
+    thumbEls.push(thumb);
+    thumbsContainer.appendChild(thumb);
+  });
 
   const nextBtn = el('button', 'live-cams__next');
   nextBtn.type = 'button';
   nextBtn.setAttribute('aria-label', 'Next cam');
-  nextBtn.textContent = '\u203A';
+  nextBtn.textContent = '>';
 
   carousel.append(prevBtn, thumbsContainer, nextBtn);
 
   let activeThumbIndex = 0;
-  const thumbEls = Array.from(thumbsContainer.children) as HTMLElement[];
-
-  const updateCarousel = (newIndex: number): void => {
-    thumbEls[activeThumbIndex].classList.remove('live-cams__thumb--active');
-    activeThumbIndex = newIndex;
-    thumbEls[activeThumbIndex].classList.add('live-cams__thumb--active');
+  const updateThumbState = (nextIndex: number): void => {
+    thumbEls[activeThumbIndex]?.classList.remove('live-cams__thumb--active');
+    activeThumbIndex = nextIndex;
+    thumbEls[activeThumbIndex]?.classList.add('live-cams__thumb--active');
     prevBtn.disabled = activeThumbIndex === 0;
-    nextBtn.disabled = activeThumbIndex === thumbEls.length - 1;
+    nextBtn.disabled = activeThumbIndex >= thumbEls.length - 1;
+    const selectedThumb = hero.thumbs[activeThumbIndex];
+    if (selectedThumb) bigImg.src = selectedThumb;
   };
 
   prevBtn.disabled = true;
+  nextBtn.disabled = thumbEls.length <= 1;
+
   prevBtn.addEventListener('click', () => {
-    if (activeThumbIndex > 0) updateCarousel(activeThumbIndex - 1);
+    if (activeThumbIndex > 0) updateThumbState(activeThumbIndex - 1);
   });
+
   nextBtn.addEventListener('click', () => {
-    if (activeThumbIndex < thumbEls.length - 1) updateCarousel(activeThumbIndex + 1);
+    if (activeThumbIndex < thumbEls.length - 1) updateThumbState(activeThumbIndex + 1);
+  });
+
+  thumbEls.forEach((thumb, index) => {
+    thumb.addEventListener('click', () => updateThumbState(index));
   });
 
   const donateCta = el('button', 'live-cams__donate-cta');
@@ -212,24 +215,29 @@ function buildLiveCams(data: AnimalData, slug: string): HTMLElement {
   return section;
 }
 
-function buildPayFeed(data: AnimalData): HTMLElement {
+function buildPayFeed(pet: PetDetailedViewModel): HTMLElement {
   const section = el('section', 'pay-feed');
 
   const text = el('div', 'pay-feed__text');
   const feedTitle = el('h2', 'pay-feed__title');
-  feedTitle.textContent = data.feedTitle;
+  feedTitle.textContent = `support ${pet.commonName}`;
+
   const feedBody = el('p', 'pay-feed__body');
-  feedBody.textContent = data.feedBody;
+  feedBody.textContent = pet.detailedDescription || pet.description;
+
   text.append(feedTitle, feedBody);
 
   const quickDonate = el('div', 'pay-feed__quick-donate');
   const quickLabel = el('p', 'pay-feed__quick-label');
   quickLabel.textContent = 'Quick Donate';
+
   const inputRow = el('div', 'pay-feed__input-row');
   const input = document.createElement('zoo-input');
   input.setAttribute('placeholder', '$ donation amount');
+
   const btn = document.createElement('amount-btn');
-  btn.setAttribute('label', '\u2192');
+  btn.setAttribute('label', '->');
+
   inputRow.append(input, btn);
   quickDonate.append(quickLabel, inputRow);
 
@@ -237,78 +245,274 @@ function buildPayFeed(data: AnimalData): HTMLElement {
   return section;
 }
 
-function buildDidYouKnow(data: AnimalData): HTMLElement {
+function buildDidYouKnow(pet: PetDetailedViewModel): HTMLElement {
   const section = el('section', 'did-you-know');
 
   const card = el('div', 'did-you-know__card');
   const cardTitle = el('h2', 'did-you-know__title');
   cardTitle.textContent = 'did you know?';
+
   const fact = el('p', 'did-you-know__fact');
-  fact.textContent = data.didFact;
+  fact.textContent = pet.description;
   card.append(cardTitle, fact);
 
   const profile = el('div', 'did-you-know__profile');
   const dl = el('dl', 'did-you-know__info');
-  for (const row of data.info) {
+
+  const rows: Array<{ dt: string; dd: string; mapLink?: boolean }> = [
+    { dt: 'Common name:', dd: pet.commonName },
+    { dt: 'Scientific name:', dd: pet.scientificName },
+    { dt: 'Type:', dd: pet.type },
+    { dt: 'Size:', dd: pet.size },
+    { dt: 'Diet:', dd: pet.diet },
+    { dt: 'Habitat:', dd: pet.habitat },
+    { dt: 'Range:', dd: pet.range, mapLink: true },
+  ];
+
+  rows.forEach((row) => {
     const dt = el('dt');
     dt.textContent = row.dt;
+
     const dd = el('dd');
-    if (row.dt === 'Range:') {
-      dd.textContent = row.dd + '\u00A0';
-      const mapLink = el('a', 'did-you-know__map-link') as HTMLAnchorElement;
-      mapLink.href = '../map/index.html';
-      mapLink.textContent = 'view map';
-      dd.appendChild(mapLink);
-    } else {
-      dd.textContent = row.dd;
+    dd.textContent = row.dd;
+
+    if (row.mapLink) {
+      const mapBtn = el('button', 'did-you-know__map-link');
+      mapBtn.type = 'button';
+      mapBtn.textContent = 'view map';
+      mapBtn.setAttribute('data-action', 'open-map');
+      dd.appendChild(mapBtn);
     }
+
     dl.append(dt, dd);
-  }
+  });
 
   const photo = el('img', 'did-you-know__photo') as HTMLImageElement;
-  photo.src = data.photo;
-  photo.alt = data.photoAlt;
+  photo.src = pet.images.profile;
+  photo.alt = pet.commonName;
+
   profile.append(dl, photo);
 
   const desc = el('p', 'did-you-know__description');
-  desc.textContent = data.description;
+  desc.textContent = pet.detailedDescription || pet.description;
 
   section.append(card, profile, desc);
   return section;
 }
 
-// ─── Component ────────────────────────────────────────────────────────────────
+function buildDetailsLoader(): HTMLDivElement {
+  const loader = el('div', 'animal-page__loader');
+  loader.textContent = 'Loading...';
+  return loader;
+}
+
+function buildErrorBox(message: string): HTMLDivElement {
+  const box = el('div', 'animal-page__error');
+  box.textContent = message;
+  return box;
+}
+
+function buildMapModal(): HTMLElement {
+  const modal = el('div', 'map-modal');
+
+  const panel = el('div', 'map-modal__panel');
+  const closeBtn = el('button', 'map-modal__close');
+  closeBtn.type = 'button';
+  closeBtn.setAttribute('aria-label', 'Close map');
+  closeBtn.setAttribute('data-action', 'close-map');
+  closeBtn.textContent = 'x';
+
+  const title = el('h3', 'map-modal__title');
+  title.textContent = 'animal habitat map';
+
+  const mapWrap = el('div', 'map-modal__map');
+  const image = el('img', 'map-modal__image') as HTMLImageElement;
+  image.src = '../../icons/map.svg';
+  image.alt = 'World map';
+
+  const pin = el('button', 'map-modal__pin');
+  pin.type = 'button';
+  pin.setAttribute('aria-label', 'Animal location');
+
+  mapWrap.append(image, pin);
+
+  const coords = el('p', 'map-modal__coords');
+  coords.textContent = 'Location: 0, 0';
+
+  panel.append(closeBtn, title, mapWrap, coords);
+  modal.appendChild(panel);
+  return modal;
+}
 
 export class AnimalPage extends HTMLElement {
   static get observedAttributes(): string[] { return ['slug']; }
 
+  private _root: HTMLElement | null = null;
+  private _cameras: CameraNavItem[] = [];
+  private _activePetId: number | null = null;
+  private _pet: PetDetailedViewModel | null = null;
+  private readonly _onEsc: (e: KeyboardEvent) => void = (e: KeyboardEvent) => {
+    if (e.key === 'Escape') this._closeMapModal();
+  };
+
   connectedCallback(): void {
     if (this.shadowRoot) return;
-    this.attachShadow({ mode: 'open' });
+
+    const shadow = this.attachShadow({ mode: 'open' });
     const style = el('style');
     style.textContent = styles;
-    this.shadowRoot!.appendChild(style);
-    this._render(this.getAttribute('slug') ?? AnimalSlug.Panda);
+    shadow.appendChild(style);
+
+    const root = el('div', 'animal-page');
+    shadow.appendChild(root);
+    this._root = root;
+
+    const fallbackHero = buildFallbackHeroData(this.getAttribute('slug') ?? AnimalSlug.Panda);
+    this._renderHeroWithLoader(fallbackHero);
+    void this._bootstrap();
   }
 
-  attributeChangedCallback(name: string, _old: string | null, newVal: string | null): void {
+  disconnectedCallback(): void {
+    document.removeEventListener('keydown', this._onEsc);
+  }
+
+  attributeChangedCallback(name: string): void {
     if (name === 'slug' && this.shadowRoot) {
-      const style = this.shadowRoot.querySelector('style');
-      this.shadowRoot.replaceChildren(style!);
-      this._render(newVal ?? AnimalSlug.Panda);
+      const fallbackHero = buildFallbackHeroData(this.getAttribute('slug') ?? AnimalSlug.Panda);
+      this._renderHeroWithLoader(fallbackHero);
+      void this._bootstrap();
     }
   }
 
-  private _render(slug: string): void {
-    const data = ANIMALS[slug as AnimalSlug] ?? ANIMALS[AnimalSlug.Panda];
-    this.shadowRoot!.appendChild(buildLiveCams(data, slug));
-    this.shadowRoot!.appendChild(buildPayFeed(data));
-    this.shadowRoot!.appendChild(buildDidYouKnow(data));
+  private _renderHeroWithLoader(hero: HeroData): void {
+    if (!this._root) return;
+    const live = buildLiveCams(hero, this._cameras, this._activePetId);
+    this._root.replaceChildren(live, buildDetailsLoader());
+    this._bindRootActions();
+  }
+
+  private _renderError(hero: HeroData): void {
+    if (!this._root) return;
+    const live = buildLiveCams(hero, this._cameras, this._activePetId);
+    this._root.replaceChildren(live, buildErrorBox(ERROR_TEXT));
+    this._bindRootActions();
+  }
+
+  private _renderLoaded(hero: HeroData, pet: PetDetailedViewModel): void {
+    if (!this._root) return;
+    const live = buildLiveCams(hero, this._cameras, this._activePetId);
+    const payFeed = buildPayFeed(pet);
+    const didYouKnow = buildDidYouKnow(pet);
+    const mapModal = buildMapModal();
+
+    this._root.replaceChildren(live, payFeed, didYouKnow, mapModal);
+    this._bindRootActions();
+  }
+
+  private _bindRootActions(): void {
+    if (!this._root) return;
+
+    this._root.querySelector('live-cam-nav')?.addEventListener('camera-select', (e: Event) => {
+      const custom = e as CustomEvent<{ petId?: number }>;
+      const petId = custom.detail?.petId;
+      if (!petId || petId === this._activePetId) return;
+      void this._selectPet(petId);
+    });
+
+    this._root.querySelector('[data-action="open-map"]')?.addEventListener('click', () => {
+      if (!this._pet) return;
+      this._openMapModal(this._pet);
+    });
+
+    this._root.querySelector('[data-action="close-map"]')?.addEventListener('click', () => {
+      this._closeMapModal();
+    });
+
+    this._root.querySelector('.map-modal')?.addEventListener('click', (e: Event) => {
+      const target = e.target as HTMLElement | null;
+      if (target?.classList.contains('map-modal')) this._closeMapModal();
+    });
+  }
+
+  private async _bootstrap(): Promise<void> {
+    const fallbackHero = buildFallbackHeroData(this.getAttribute('slug') ?? AnimalSlug.Panda);
+
+    try {
+      const camerasResponse = await camerasService.getCameras();
+      this._cameras = camerasResponse.data.map((camera) => toCameraNavItem(camera));
+
+      const slug = this.getAttribute('slug') ?? AnimalSlug.Panda;
+      const initialCamera = this._cameras.find((cam) => cam.slug === slug) ?? this._cameras[0];
+      if (!initialCamera) {
+        this._renderError(fallbackHero);
+        return;
+      }
+
+      await this._selectPet(initialCamera.petId);
+    } catch {
+      this._renderError(fallbackHero);
+    }
+  }
+
+  private async _selectPet(petId: number): Promise<void> {
+    if (!this._root) return;
+
+    const currentHero = this._pet
+      ? buildHeroData(this._pet, this._cameraLabelByPetId(this._activePetId))
+      : buildFallbackHeroData(this.getAttribute('slug') ?? AnimalSlug.Panda);
+
+    this._activePetId = petId;
+    this._renderHeroWithLoader(currentHero);
+
+    try {
+      const response = await petsService.getPetById(petId);
+      const pet = mapPetDetailedDtoToViewModel(response.data);
+      this._pet = pet;
+      const hero = buildHeroData(pet, this._cameraLabelByPetId(petId));
+      this._renderLoaded(hero, pet);
+    } catch {
+      this._renderError(currentHero);
+    }
+  }
+
+  private _cameraLabelByPetId(petId: number | null): string {
+    if (petId === null) return 'Main live cam';
+    const camera = this._cameras.find((item) => item.petId === petId);
+    return camera?.label ?? 'Main live cam';
+  }
+
+  private _openMapModal(pet: PetDetailedViewModel): void {
+    if (!this._root) return;
+    const modal = this._root.querySelector<HTMLElement>('.map-modal');
+    if (!modal) return;
+
+    const coords = this._root.querySelector<HTMLElement>('.map-modal__coords');
+    if (coords) {
+      coords.textContent = `Location: ${pet.latitude}, ${pet.longitude}`;
+    }
+
+    const mapWrap = this._root.querySelector<HTMLElement>('.map-modal__map');
+    if (mapWrap) {
+      const pos = toPercentPosition(pet.latitude, pet.longitude);
+      mapWrap.style.setProperty('--pin-x', pos.x);
+      mapWrap.style.setProperty('--pin-y', pos.y);
+    }
+
+    modal.classList.add('map-modal--open');
+    document.body.style.overflow = 'hidden';
+    document.addEventListener('keydown', this._onEsc);
+  }
+
+  private _closeMapModal(): void {
+    if (!this._root) return;
+    const modal = this._root.querySelector<HTMLElement>('.map-modal');
+    if (!modal) return;
+
+    modal.classList.remove('map-modal--open');
+    document.body.style.overflow = '';
+    document.removeEventListener('keydown', this._onEsc);
   }
 }
 
 customElements.define('animal-page', AnimalPage);
 export default AnimalPage;
-
-// Satisfy compiler — imported but inferred types used
-export type { AnimalThumb, AnimalInfo };
