@@ -15,7 +15,7 @@ export const authService = {
     return apiClient.post<AuthResponseDto, LoginRequestDto>('/auth/login', payload);
   },
 
-  getProfile(token: string): Promise<GetProfileSuccessResponseDto> {
+  getProfile(token?: string): Promise<GetProfileSuccessResponseDto> {
     return apiClient.get<GetProfileSuccessResponseDto>('/auth/profile', { token });
   },
 };

@@ -15,6 +15,8 @@ export default defineConfig({
         eagle: page('pages/eagle/index.html'),
         gorilla: page('pages/gorilla/index.html'),
         contact: page('pages/contact/index.html'),
+        login: page('pages/login/index.html'),
+        register: page('pages/register/index.html'),
       },
     },
   },

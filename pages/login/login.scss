@@ -1,0 +1,95 @@
+@use '../../src/styles/variables' as *;
+
+.auth-page {
+  min-height: 70vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 72px 24px;
+  background: linear-gradient(180deg, rgba(0, 160, 146, 0.1) 0%, rgba(32, 17, 61, 0.08) 100%);
+
+  &__card {
+    width: 100%;
+    max-width: 520px;
+    background: $color-white;
+    border: 1px solid rgba(32, 17, 61, 0.18);
+    box-shadow: 0 16px 48px rgba(32, 17, 61, 0.18);
+    border-radius: 16px;
+    padding: 36px;
+  }
+
+  &__title {
+    margin: 0;
+    font-size: 2rem;
+    line-height: 1.1;
+    text-transform: uppercase;
+    color: $color-navy;
+  }
+
+  &__subtitle {
+    margin: 12px 0 28px;
+    color: rgba(32, 17, 61, 0.82);
+    line-height: 1.55;
+  }
+
+  &__form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  &__error {
+    min-height: 22px;
+    margin: 0;
+    font-size: 0.875rem;
+    color: $color-orange;
+    font-weight: $font-weight-bold;
+  }
+
+  &__cta {
+    margin-top: 4px;
+  }
+
+  &__meta {
+    margin: 18px 0 0;
+    color: $color-navy;
+    font-size: 0.9375rem;
+  }
+
+  &__link {
+    color: $color-turquoise;
+    font-weight: $font-weight-bold;
+    text-decoration: none;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}
+
+@media (max-width: 640px) {
+  .auth-page {
+    padding: 48px 16px;
+
+    &__card {
+      border-radius: 12px;
+      padding: 24px;
+    }
+
+    &__title {
+      font-size: 1.625rem;
+    }
+  }
+}
+
+@media (max-width: 320px) {
+  .auth-page {
+    &__card {
+      padding: 18px;
+    }
+
+    &__subtitle {
+      font-size: 0.875rem;
+    }
+  }
+}

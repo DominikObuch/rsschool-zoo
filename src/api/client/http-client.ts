@@ -1,11 +1,12 @@
 import type { ApiErrorResponseDto } from '../models/common.dto.ts';
+import { authTokenStorage } from '../../utils/auth-token.ts';
 
 type HttpMethod = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
 
 interface RequestOptions {
   method?: HttpMethod;
   body?: unknown;
-  token?: string;
+  token?: string | null;
   headers?: Record<string, string>;
   signal?: AbortSignal;
 }
@@ -25,24 +26,36 @@ export class HttpClient {
       ...options.headers,
     };
 
-    if (options.token) {
-      headers.Authorization = `Bearer ${options.token}`;
+    const token = options.token === undefined ? authTokenStorage.get() : options.token;
+    if (token) {
+      headers.Authorization = `Bearer ${token}`;
     }
 
-    const response = await fetch(this.resolveUrl(path), {
-      method,
-      headers,
-      body: options.body === undefined ? undefined : JSON.stringify(options.body),
-      signal: options.signal,
-    });
+    let response: Response;
+    try {
+      response = await fetch(this.resolveUrl(path), {
+        method,
+        headers,
+        body: options.body === undefined ? undefined : JSON.stringify(options.body),
+        signal: options.signal,
+      });
+    } catch {
+      throw {
+        message: 'Network error. Please try again.',
+        statusCode: 0,
+      } satisfies ApiErrorResponseDto;
+    }
 
     const payload = await this.tryParseJson(response);
 
     if (!response.ok) {
       const apiError = (payload as ApiErrorResponseDto | null) ?? {
-        message: response.statusText,
+        message: response.statusText || 'Request failed',
         statusCode: response.status,
       };
+
+      if (!apiError.statusCode) apiError.statusCode = response.status;
+      if (!apiError.message) apiError.message = response.statusText || 'Request failed';
       throw apiError;
     }
 

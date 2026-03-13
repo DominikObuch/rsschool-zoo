@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/png" href="../../Favicon.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet" />
+    <title>Online Zoo - Register</title>
+    <script type="module" src="../../components/layout/layout.ts"></script>
+    <script type="module" src="../../components/zoo-input/zoo-input.ts"></script>
+    <script type="module" src="../../components/zoo-btn/zoo-btn.ts"></script>
+    <script type="module" src="./script.ts"></script>
+  </head>
+  <body>
+    <zoo-layout>
+      <section class="auth-page">
+        <div class="auth-page__card">
+          <h1 class="auth-page__title">register</h1>
+          <p class="auth-page__subtitle">Create your account and join our wildlife protection community.</p>
+
+          <form class="auth-page__form" novalidate>
+            <zoo-input
+              label="* Name"
+              name="name"
+              placeholder="Enter your name"
+              required
+            ></zoo-input>
+            <zoo-input
+              label="* Login"
+              name="login"
+              placeholder="Create login"
+              required
+            ></zoo-input>
+            <zoo-input
+              label="* Email"
+              name="email"
+              type="email"
+              placeholder="Enter your email"
+              required
+            ></zoo-input>
+            <zoo-input
+              label="* Password"
+              name="password"
+              type="password"
+              placeholder="Create password"
+              required
+            ></zoo-input>
+            <zoo-input
+              label="* Confirm password"
+              name="confirmPassword"
+              type="password"
+              placeholder="Repeat password"
+              required
+            ></zoo-input>
+
+            <p class="auth-page__error" id="register-form-error" aria-live="polite"></p>
+
+            <zoo-btn
+              variant="turquoise"
+              label="register"
+              class="auth-page__cta"
+            ></zoo-btn>
+          </form>
+
+          <p class="auth-page__meta">
+            Already have an account?
+            <a class="auth-page__link" href="../login/index.html">Sign in</a>
+          </p>
+        </div>
+      </section>
+    </zoo-layout>
+
+    <script type="module" src="../../components/donate-popup/donate-popup.ts"></script>
+    <donate-popup id="donate-popup"></donate-popup>
+  </body>
+</html>

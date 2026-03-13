@@ -64,6 +64,15 @@ export class ZooInput extends HTMLElement {
         }));
       });
     });
+
+    (['focus', 'blur'] as const).forEach((type) => {
+      field?.addEventListener(type, () => {
+        this.dispatchEvent(new CustomEvent(type, {
+          bubbles: true,
+          composed: true,
+        }));
+      });
+    });
   }
 
   attributeChangedCallback(name: string, _old: string | null, newVal: string | null): void {
