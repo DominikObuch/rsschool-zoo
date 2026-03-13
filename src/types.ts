@@ -26,6 +26,13 @@ export interface AnimalThumb {
   active?: boolean;
 }
 
+export interface ProductImageSet {
+  id: number;
+  main: string;
+  profile: string;
+  thumbs: [string, string, string];
+}
+
 export interface AnimalInfo {
   dt: string;
   dd: string;
@@ -75,32 +82,3 @@ export enum BtnVariant {
   Arrow = 'arrow',
   Nav = 'nav',
 }
-
-// API contracts for backend compatibility
-export interface ApiResponse<TData> {
-  success: boolean;
-  data: TData;
-  message?: string;
-}
-
-export interface ApiError {
-  code: string;
-  message: string;
-  details?: Record<string, string>;
-}
-
-export interface AnimalDto {
-  slug: AnimalSlug;
-  name: string;
-  habitat: string;
-  diet: string;
-}
-
-export interface DonationPayload {
-  amount: number;
-  email: string;
-  animalSlug?: AnimalSlug;
-}
-
-export type DonationResult = ApiResponse<Readonly<Pick<DonationPayload, 'amount' | 'animalSlug'>>>;
-export type AnimalPatchPayload = Partial<Omit<AnimalDto, 'slug'>>;

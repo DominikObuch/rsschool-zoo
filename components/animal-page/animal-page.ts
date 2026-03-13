@@ -4,19 +4,31 @@ import '../zoo-input/zoo-input.ts';
 import '../amount-btn/amount-btn.ts';
 import type { AnimalData, AnimalThumb, AnimalInfo } from '../../src/types.ts';
 import { AnimalSlug } from '../../src/types.ts';
+import { getProductImagesBySlug } from '../../src/assets/product-images.ts';
+
+function buildCamThumbs(slug: AnimalSlug, altPrefix: string): AnimalThumb[] {
+  const { thumbs } = getProductImagesBySlug(slug);
+  return thumbs.map((src, index) => ({
+    src,
+    alt: `${altPrefix} cam ${index + 1}`,
+    label: `CAM ${index + 1}`,
+    active: index === 0,
+  }));
+}
+
+const pandaImages = getProductImagesBySlug(AnimalSlug.Panda);
+const eagleImages = getProductImagesBySlug(AnimalSlug.Eagle);
+const gorillaImages = getProductImagesBySlug(AnimalSlug.Gorilla);
+const lemurImages = getProductImagesBySlug(AnimalSlug.Lemur);
 
 // ─── Animal data ──────────────────────────────────────────────────────────────
 const ANIMALS: Record<AnimalSlug, AnimalData> = {
   [AnimalSlug.Panda]: {
     pageTitle:   'live panda cams',
     camLabel:    'Lucas, the Giant Panda cam 1',
-    mainImage:   '../../images/youtubePlayer/pandaBig.png',
+    mainImage:   pandaImages.main,
     mainAlt:     'Giant panda — Lucas, cam 1',
-    thumbs: [
-      { src: '../../images/youtubePlayer/Panda additional cam card.png',   alt: 'Panda cam 1', label: 'CAM 1', active: true },
-      { src: '../../images/youtubePlayer/Panda additional cam card-1.png', alt: 'Panda cam 2', label: 'CAM 2' },
-      { src: '../../images/youtubePlayer/Panda additional cam card-2.png', alt: 'Panda cam 3', label: 'CAM 3' },
-    ],
+    thumbs:      buildCamThumbs(AnimalSlug.Panda, 'Panda'),
     feedTitle: 'make the bamboo donation!',
     feedBody:  'Our process for bamboo donations first starts with a site evaluation. It is important that our team sees where the bamboo is growing, then determining if the bamboo is a species that our animals are currently eating. Thank you for your interest in donating bamboo for our pandas.',
     didFact:   'Pandas are often seen eating in a relaxed sitting posture, with their hind legs stretched out before them. They may appear sedentary, but they are skilled tree-climbers and efficient swimmers.',
@@ -29,7 +41,7 @@ const ANIMALS: Record<AnimalSlug, AnimalData> = {
       { dt: 'Habitat:',         dd: 'Forests' },
       { dt: 'Range:',           dd: 'Eastern Asia' },
     ],
-    photo:       '../../images/youtubePlayer/pandaBig.png',
+    photo:       pandaImages.profile,
     photoAlt:    'Giant Panda',
     description: 'Giant pandas are very unusual animals that eat almost exclusively bamboo, which is very low in nutrients. Because of this, they have many unique adaptations for their low-energy lifestyle. Giant pandas are solitary. They have a highly developed sense of smell that males use to avoid each other and to find females for mating in the spring. After a five-month pregnancy, females give birth to a cub or two, though they cannot care for both twins. The blind infants weigh only 5 ounces at birth and cannot crawl until they reach three months of age. They are born white, and develop their much loved coloring later. Habitat loss is the primary threat to this species. Its popularity around the world has helped the giant panda become the focus of successful conservation programs.',
   },
@@ -37,13 +49,9 @@ const ANIMALS: Record<AnimalSlug, AnimalData> = {
   [AnimalSlug.Eagle]: {
     pageTitle:   'bald eagle cams',
     camLabel:    'Bald Eagle cam',
-    mainImage:   '../../images/youtubePlayer/baldEagleBIg.png',
+    mainImage:   eagleImages.main,
     mainAlt:     'Bald Eagle cam',
-    thumbs: [
-      { src: '../../images/youtubePlayer/Eagles additional cam card.png',   alt: 'Eagle cam 1', label: 'CAM 1', active: true },
-      { src: '../../images/youtubePlayer/Eagles additional cam card-1.png', alt: 'Eagle cam 2', label: 'CAM 2' },
-      { src: '../../images/youtubePlayer/Eagles additional cam card-2.png', alt: 'Eagle cam 3', label: 'CAM 3' },
-    ],
+    thumbs:      buildCamThumbs(AnimalSlug.Eagle, 'Eagle'),
     feedTitle: 'keep the bald eagle cams streaming!',
     feedBody:  'Watch as this lifelong pair of eagle parents lay and protect eggs, feed their chicks and teach them to hunt and fly. Sam & Lora — 100% of the donations from this page will be utilized directly for the streaming and operational costs of this project.',
     didFact:   'Because of its role as a symbol of the US, but also because of its being a large predator, the bald eagle has many representations in popular culture. Not all of these representations are accurate. In particular, the movie or television bald eagle typically has a bold, powerful cry. The actual eagle has a much softer chirpy voice, not in keeping with its popular image.',
@@ -56,7 +64,7 @@ const ANIMALS: Record<AnimalSlug, AnimalData> = {
       { dt: 'Habitat:',         dd: 'Seacoasts, rivers, large lakes or marshes' },
       { dt: 'Range:',           dd: 'Continental United States' },
     ],
-    photo:       '../../images/youtubePlayer/baldEagleBIg.png',
+    photo:       eagleImages.profile,
     photoAlt:    'Bald Eagle',
     description: 'The bald eagle is a bird of prey found in North America. A sea eagle, it has two known subspecies and forms a species pair with the white-tailed eagle. Its range includes most of Canada and Alaska, all of the contiguous United States, and northern Mexico. It is found near large bodies of open water with an abundant food supply and old-growth trees for nesting. The bald eagle is an opportunistic feeder which subsists mainly on fish, which it swoops down and snatches from the water with its talons. It builds the largest nest of any North American bird and the largest tree nests ever recorded for any animal species, up to 4 m deep, 2.5 m wide, and 1 metric ton in weight. Sexual maturity is attained at the age of four to five years. Bald eagles can live up to 28 years in the wild and 36 years in captivity.',
   },
@@ -64,13 +72,9 @@ const ANIMALS: Record<AnimalSlug, AnimalData> = {
   [AnimalSlug.Gorilla]: {
     pageTitle:   'gorillas cams',
     camLabel:    'Gorilla cam',
-    mainImage:   '../../images/youtubePlayer/gorillaBig.png',
+    mainImage:   gorillaImages.main,
     mainAlt:     'Gorilla cam',
-    thumbs: [
-      { src: '../../images/youtubePlayer/Gorilla additional cam card.png',   alt: 'Gorilla cam 1', label: 'CAM 1', active: true },
-      { src: '../../images/youtubePlayer/Gorilla additional cam card-1.png', alt: 'Gorilla cam 2', label: 'CAM 2' },
-      { src: '../../images/youtubePlayer/Gorilla additional cam card-2.png', alt: 'Gorilla cam 3', label: 'CAM 3' },
-    ],
+    thumbs:      buildCamThumbs(AnimalSlug.Gorilla, 'Gorilla'),
     feedTitle: 'make a difference for the gorillas!',
     feedBody:  'It is our goal to ensure the conservation and restoration of the gorilla population and their habitat in Central Africa. To do this, we need your help! Bring your food charity straight to Glen and his family.',
     didFact:   'In addition to having distinctive fingerprints like humans do, gorillas also have unique nose prints. Gorillas are the largest of the great apes, but the western lowland gorilla is the smallest of the subspecies.',
@@ -83,7 +87,7 @@ const ANIMALS: Record<AnimalSlug, AnimalData> = {
       { dt: 'Habitat:',         dd: 'Rainforests' },
       { dt: 'Range:',           dd: 'Western Africa' },
     ],
-    photo:       '../../images/youtubePlayer/gorillaBig.png',
+    photo:       gorillaImages.profile,
     photoAlt:    'Western Lowland Gorilla',
     description: "The western lowland gorilla is the most numerous and widespread of all gorilla subspecies. Populations can be found in Cameroon, the Central African Republic, the Democratic Republic of Congo and Equatorial Guinea as well as in large areas in Gabon and the Republic of Congo. The large, powerful bodies of gorillas are covered in coarse, dark fur, except on the face, ears, hands, and feet. Older male gorillas are called silverbacks because of the distinctive patch of silver hair on their backs. A gorilla's arms are longer than its legs, and it tends to walk on all fours by curling its fingers inward and walking on the knuckles. Gorillas are primarily herbivorous, feeding on plants, fruits and seeds. They live in groups of 2 to 30 individuals led by a dominant silverback male.",
   },
@@ -91,13 +95,9 @@ const ANIMALS: Record<AnimalSlug, AnimalData> = {
   [AnimalSlug.Lemur]: {
     pageTitle:   'lemur cams',
     camLabel:    'Ring-Tailed Lemur cam',
-    mainImage:   '../../images/youtubePlayer/lemursBig.png',
+    mainImage:   lemurImages.main,
     mainAlt:     'Ring-tailed lemur cam',
-    thumbs: [
-      { src: '../../images/youtubePlayer/Lemur additional cam card.png',   alt: 'Lemur cam 1', label: 'CAM 1', active: true },
-      { src: '../../images/youtubePlayer/Lemur additional cam card-1.png', alt: 'Lemur cam 2', label: 'CAM 2' },
-      { src: '../../images/youtubePlayer/Lemur additional cam card-2.png', alt: 'Lemur cam 3', label: 'CAM 3' },
-    ],
+    thumbs:      buildCamThumbs(AnimalSlug.Lemur, 'Lemur'),
     feedTitle: 'provide andy the lemur with fruits!',
     feedBody:  'More than 90% of lemur species are endangered and might face extinction in the nearest future. Watch the ring-tailed lemurs play and climb in this soothing setting and support them by donating for the fruits they adore.',
     didFact:   'A ring-tailed lemur mob will gather in open areas of the forest to sunbathe. They sit in what some call a "yoga position" with their bellies toward the sun and their arms and legs stretched out to the sides.',
@@ -110,7 +110,7 @@ const ANIMALS: Record<AnimalSlug, AnimalData> = {
       { dt: 'Habitat:',         dd: 'Arid, open areas and forests' },
       { dt: 'Range:',           dd: 'Madagascar' },
     ],
-    photo:       '../../images/youtubePlayer/lemursBig.png',
+    photo:       lemurImages.profile,
     photoAlt:    'Ring-Tailed Lemur',
     description: 'Ring-tailed lemurs are named for the 13 alternating black and white bands that adorn their tails. Unlike most other lemurs, ringtails spend 40 percent of their time on the ground, moving quadrupedally along the forest floor. Ring-tailed lemurs live in southwestern Madagascar, in arid, open spaces and forests in territories that range from 15 to 57 acres. As with all lemurs, olfactory communication relies on scent glands on their wrists and chests that they use to mark their foraging routes. They can also eat fruit, herbs and small vertebrates. Females usually give birth to their first baby when they are three years old, and usually once a year every year after that. All adult females participate in raising the offspring of the group. The median life expectancy for a ring-tailed lemur is about 16 years.',
   },
