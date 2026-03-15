@@ -1,6 +1,6 @@
 import styles from './animal-card.scss?inline';
 
-const PLACEHOLDER_IMAGE = '/images/Placeholder.png';
+const PLACEHOLDER_IMAGE = `${import.meta.env.BASE_URL}images/Placeholder.png`;
 
 const template = document.createElement('template');
 

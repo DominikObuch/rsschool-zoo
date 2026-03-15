@@ -1,6 +1,7 @@
 import { AnimalSlug, type ProductImageSet } from '../types.ts';
 
 const FALLBACK_ID = 0;
+const ASSET_BASE = import.meta.env.BASE_URL;
 
 const productIdBySlug: Record<AnimalSlug, number> = {
   [AnimalSlug.Panda]: 1,
@@ -12,46 +13,74 @@ const productIdBySlug: Record<AnimalSlug, number> = {
 const productImagesById: Record<number, ProductImageSet> = {
   0: {
     id: 0,
-    main: '/images/Placeholder.png',
-    profile: '/images/Placeholder.png',
-    thumbs: ['/images/Placeholder.png', '/images/Placeholder.png', '/images/Placeholder.png'],
+    main: `${ASSET_BASE}images/Placeholder.png`,
+    profile: `${ASSET_BASE}images/Placeholder.png`,
+    thumbs: [
+      `${ASSET_BASE}images/Placeholder.png`,
+      `${ASSET_BASE}images/Placeholder.png`,
+      `${ASSET_BASE}images/Placeholder.png`,
+    ],
   },
   1: {
     id: 1,
-    main: '/images/products/1/main.png',
-    profile: '/images/products/1/profile.png',
-    thumbs: ['/images/products/1/thumb-1.png', '/images/products/1/thumb-2.png', '/images/products/1/thumb-3.png'],
+    main: `${ASSET_BASE}images/products/1/main.png`,
+    profile: `${ASSET_BASE}images/products/1/profile.png`,
+    thumbs: [
+      `${ASSET_BASE}images/products/1/thumb-1.png`,
+      `${ASSET_BASE}images/products/1/thumb-2.png`,
+      `${ASSET_BASE}images/products/1/thumb-3.png`,
+    ],
   },
   2: {
     id: 2,
-    main: '/images/products/2/main.png',
-    profile: '/images/products/2/profile.png',
-    thumbs: ['/images/products/2/thumb-1.png', '/images/products/2/thumb-2.png', '/images/products/2/thumb-3.png'],
+    main: `${ASSET_BASE}images/products/2/main.png`,
+    profile: `${ASSET_BASE}images/products/2/profile.png`,
+    thumbs: [
+      `${ASSET_BASE}images/products/2/thumb-1.png`,
+      `${ASSET_BASE}images/products/2/thumb-2.png`,
+      `${ASSET_BASE}images/products/2/thumb-3.png`,
+    ],
   },
   3: {
     id: 3,
-    main: '/images/products/3/main.png',
-    profile: '/images/products/3/profile.png',
-    thumbs: ['/images/products/3/thumb-1.png', '/images/products/3/thumb-2.png', '/images/products/3/thumb-3.png'],
+    main: `${ASSET_BASE}images/products/3/main.png`,
+    profile: `${ASSET_BASE}images/products/3/profile.png`,
+    thumbs: [
+      `${ASSET_BASE}images/products/3/thumb-1.png`,
+      `${ASSET_BASE}images/products/3/thumb-2.png`,
+      `${ASSET_BASE}images/products/3/thumb-3.png`,
+    ],
   },
   4: {
     id: 4,
-    main: '/images/products/4/main.png',
-    profile: '/images/products/4/profile.png',
-    thumbs: ['/images/products/4/thumb-1.png', '/images/products/4/thumb-2.png', '/images/products/4/thumb-3.png'],
+    main: `${ASSET_BASE}images/products/4/main.png`,
+    profile: `${ASSET_BASE}images/products/4/profile.png`,
+    thumbs: [
+      `${ASSET_BASE}images/products/4/thumb-1.png`,
+      `${ASSET_BASE}images/products/4/thumb-2.png`,
+      `${ASSET_BASE}images/products/4/thumb-3.png`,
+    ],
   },
   // Manual additions for products not present in main design assets.
   5: {
     id: 5,
-    main: '/images/products/5/main.png',
-    profile: '/images/products/5/profile.png',
-    thumbs: ['/images/products/5/thumb-1.png', '/images/products/5/thumb-2.png', '/images/products/5/thumb-3.png'],
+    main: `${ASSET_BASE}images/products/5/main.png`,
+    profile: `${ASSET_BASE}images/products/5/profile.png`,
+    thumbs: [
+      `${ASSET_BASE}images/products/5/thumb-1.png`,
+      `${ASSET_BASE}images/products/5/thumb-2.png`,
+      `${ASSET_BASE}images/products/5/thumb-3.png`,
+    ],
   },
   6: {
     id: 6,
-    main: '/images/products/6/main.png',
-    profile: '/images/products/6/profile.png',
-    thumbs: ['/images/products/6/thumb-1.png', '/images/products/6/thumb-2.png', '/images/products/6/thumb-3.png'],
+    main: `${ASSET_BASE}images/products/6/main.png`,
+    profile: `${ASSET_BASE}images/products/6/profile.png`,
+    thumbs: [
+      `${ASSET_BASE}images/products/6/thumb-1.png`,
+      `${ASSET_BASE}images/products/6/thumb-2.png`,
+      `${ASSET_BASE}images/products/6/thumb-3.png`,
+    ],
   },
 };
 

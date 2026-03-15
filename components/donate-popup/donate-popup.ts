@@ -8,6 +8,7 @@ import { lockBodyScroll, unlockBodyScroll } from '../../src/utils/body-scroll-lo
 //   donatePopup.close() – hide the popup, restore body scroll
 
 const AMOUNTS: string[] = ['$20', '$30', '$50', '$80', '$100', 'other amount'];
+const ASSET_BASE = import.meta.env.BASE_URL;
 
 const template = document.createElement('template');
 
@@ -31,7 +32,7 @@ function buildTemplate(): void {
 
   const img = document.createElement('img');
   img.className = 'donate-popup__image';
-  img.src = '/images/donate.png';
+  img.src = `${ASSET_BASE}images/donate.png`;
   img.alt = 'Hands touching a lion paw';
 
   const body = document.createElement('div');
