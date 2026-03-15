@@ -739,6 +739,16 @@
 
   &__slider-wrap {
     grid-area: slider;
+
+    zoo-slider {
+      --slider-btn-color: #{$color-white};
+      --slider-btn-hover-bg: rgba(#{$color-white}, 0.18);
+      --slider-btn-size: 58px;
+      --slider-btn-border: 3px;
+      --slider-btn-radius: 8px;
+      --slider-arrow-w: 20px;
+      --slider-arrow-h: 16px;
+    }
   }
 
   &__leave {

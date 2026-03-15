@@ -1,6 +1,8 @@
 import styles from './slider.scss?inline';
 import type { SliderLayout } from '../../src/types.ts';
 
+type SliderVariant = 'pets' | 'feedback';
+
 const template = document.createElement('template');
 
 function buildTemplate(): void {
@@ -42,6 +44,10 @@ export class ZooSlider extends HTMLElement {
   private _grid: HTMLDivElement | null = null;
   private _resizeObserver: ResizeObserver | null = null;
 
+  static get observedAttributes(): string[] {
+    return ['variant'];
+  }
+
   connectedCallback(): void {
     if (this.shadowRoot) return;
     const shadow = this.attachShadow({ mode: 'open' });
@@ -67,6 +73,11 @@ export class ZooSlider extends HTMLElement {
     this._update();
   }
 
+  attributeChangedCallback(): void {
+    this.#page = 0;
+    this._update();
+  }
+
   disconnectedCallback(): void {
     this._resizeObserver?.disconnect();
   }
@@ -76,14 +87,22 @@ export class ZooSlider extends HTMLElement {
   }
 
   private _layout(): SliderLayout {
+    const variant: SliderVariant = this.getAttribute('variant') === 'feedback' ? 'feedback' : 'pets';
     const w = window.innerWidth;
+
+    if (variant === 'feedback') {
+      if (w <= 640) return { cols: 1, rows: 1, perPage: 1 };
+      if (w <= 1200) return { cols: 2, rows: 1, perPage: 2 };
+      return { cols: 4, rows: 1, perPage: 4 };
+    }
+
     let cols: number;
-    let rows: number;
-    if (w <= 480) { cols = 1; rows = 1; }
-    else if (w <= 640) { cols = 2; rows = 1; }
-    else if (w <= 1200) { cols = 3; rows = 2; }
-    else { cols = 4; rows = 2; }
-    return { cols, rows, perPage: cols * rows };
+    if (w <= 480) cols = 1;
+    else if (w <= 640) cols = 2;
+    else if (w <= 1200) cols = 3;
+    else cols = 4;
+
+    return { cols, rows: 1, perPage: cols };
   }
 
   private _go(dir: number): void {
@@ -109,7 +128,17 @@ export class ZooSlider extends HTMLElement {
     const end = start + perPage;
 
     cards.forEach((card, i) => {
-      (card as HTMLElement).hidden = i < start || i >= end;
+      const element = card as HTMLElement;
+      const isVisible = i >= start && i < end;
+
+      // Use inline display to guarantee paging even when page styles set display on cards.
+      if (isVisible) {
+        element.style.removeProperty('display');
+        element.setAttribute('aria-hidden', 'false');
+      } else {
+        element.style.display = 'none';
+        element.setAttribute('aria-hidden', 'true');
+      }
     });
 
     if (this._grid) {

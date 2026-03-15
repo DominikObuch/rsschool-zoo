@@ -108,7 +108,7 @@
     outline: none;
 
     &:focus {
-      border-color: darken($color-turquoise, 10%);
+      border-color: color.adjust($color-turquoise, $lightness: -10%);
     }
 
     &.feed-popup__field--error {
@@ -416,6 +416,11 @@
     mask-size: contain;
     mask-repeat: no-repeat;
     mask-position: center;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
   }
 }
 

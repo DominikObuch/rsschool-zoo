@@ -7,6 +7,7 @@ import { getProductImagesBySlug } from '../../src/assets/product-images.ts';
 import { camerasService } from '../../src/api/services/cameras.service.ts';
 import { petsService } from '../../src/api/services/pets.service.ts';
 import { mapPetDetailedDtoToViewModel } from '../../src/api/mappers/pet.mapper.ts';
+import { lockBodyScroll, unlockBodyScroll } from '../../src/utils/body-scroll-lock.ts';
 import type { CameraDto } from '../../src/api/models/cameras.dto.ts';
 import type { PetDetailedViewModel } from '../../src/api/mappers/pet.mapper.ts';
 
@@ -40,21 +41,21 @@ function parseCoord(value: string): number | null {
   return parsed;
 }
 
-function toPercentPosition(latitude: string, longitude: string): { x: string; y: string } {
+function buildOpenStreetMapEmbed(latitude: string, longitude: string): string {
   const lat = parseCoord(latitude);
   const lon = parseCoord(longitude);
-
   if (lat === null || lon === null) {
-    return { x: '50%', y: '50%' };
+    return 'https://www.openstreetmap.org/export/embed.html?bbox=-20%2C20%2C20%2C60&layer=mapnik';
   }
 
-  const x = Math.min(100, Math.max(0, ((lon + 180) / 360) * 100));
-  const y = Math.min(100, Math.max(0, ((90 - lat) / 180) * 100));
+  const delta = 8;
+  const minLon = Math.max(-180, lon - delta);
+  const minLat = Math.max(-90, lat - delta);
+  const maxLon = Math.min(180, lon + delta);
+  const maxLat = Math.min(90, lat + delta);
 
-  return {
-    x: `${x.toFixed(2)}%`,
-    y: `${y.toFixed(2)}%`,
-  };
+  const bbox = [minLon, minLat, maxLon, maxLat].map((item) => item.toFixed(6)).join('%2C');
+  return `https://www.openstreetmap.org/export/embed.html?bbox=${bbox}&layer=mapnik&marker=${lat.toFixed(6)}%2C${lon.toFixed(6)}`;
 }
 
 function resolveSlug(value: string): string {
@@ -326,15 +327,11 @@ function buildMapModal(): HTMLElement {
   title.textContent = 'animal habitat map';
 
   const mapWrap = el('div', 'map-modal__map');
-  const image = el('img', 'map-modal__image') as HTMLImageElement;
-  image.src = '../../icons/map.svg';
-  image.alt = 'World map';
-
-  const pin = el('button', 'map-modal__pin');
-  pin.type = 'button';
-  pin.setAttribute('aria-label', 'Animal location');
-
-  mapWrap.append(image, pin);
+  const frame = el('iframe', 'map-modal__frame') as HTMLIFrameElement;
+  frame.src = buildOpenStreetMapEmbed('50', '0');
+  frame.title = 'Animal habitat map';
+  frame.loading = 'lazy';
+  mapWrap.append(frame);
 
   const coords = el('p', 'map-modal__coords');
   coords.textContent = 'Location: 0, 0';
@@ -342,6 +339,14 @@ function buildMapModal(): HTMLElement {
   panel.append(closeBtn, title, mapWrap, coords);
   modal.appendChild(panel);
   return modal;
+}
+
+function buildDetailsOverlayLoader(): HTMLDivElement {
+  const overlay = el('div', 'animal-page__details-overlay');
+  const spinner = el('div', 'animal-page__details-spinner');
+  spinner.textContent = 'Loading...';
+  overlay.appendChild(spinner);
+  return overlay;
 }
 
 export class AnimalPage extends HTMLElement {
@@ -374,6 +379,7 @@ export class AnimalPage extends HTMLElement {
 
   disconnectedCallback(): void {
     document.removeEventListener('keydown', this._onEsc);
+    unlockBodyScroll();
   }
 
   attributeChangedCallback(name: string): void {
@@ -407,6 +413,13 @@ export class AnimalPage extends HTMLElement {
 
     this._root.replaceChildren(live, payFeed, didYouKnow, mapModal);
     this._bindRootActions();
+  }
+
+  private _showDetailsOverlayLoader(): void {
+    if (!this._root) return;
+    const existing = this._root.querySelector('.animal-page__details-overlay');
+    if (existing) return;
+    this._root.appendChild(buildDetailsOverlayLoader());
   }
 
   private _bindRootActions(): void {
@@ -457,12 +470,21 @@ export class AnimalPage extends HTMLElement {
   private async _selectPet(petId: number): Promise<void> {
     if (!this._root) return;
 
+    const previousPetId = this._activePetId;
+
     const currentHero = this._pet
-      ? buildHeroData(this._pet, this._cameraLabelByPetId(this._activePetId))
+      ? buildHeroData(this._pet, this._cameraLabelByPetId(previousPetId))
       : buildFallbackHeroData(this.getAttribute('slug') ?? AnimalSlug.Panda);
 
     this._activePetId = petId;
-    this._renderHeroWithLoader(currentHero);
+    if (this._pet) {
+      const previousPet = this._pet;
+      const previousHero = buildHeroData(previousPet, this._cameraLabelByPetId(previousPetId));
+      this._renderLoaded(previousHero, previousPet);
+      this._showDetailsOverlayLoader();
+    } else {
+      this._renderHeroWithLoader(currentHero);
+    }
 
     try {
       const response = await petsService.getPetById(petId);
@@ -491,15 +513,13 @@ export class AnimalPage extends HTMLElement {
       coords.textContent = `Location: ${pet.latitude}, ${pet.longitude}`;
     }
 
-    const mapWrap = this._root.querySelector<HTMLElement>('.map-modal__map');
-    if (mapWrap) {
-      const pos = toPercentPosition(pet.latitude, pet.longitude);
-      mapWrap.style.setProperty('--pin-x', pos.x);
-      mapWrap.style.setProperty('--pin-y', pos.y);
+    const mapFrame = this._root.querySelector<HTMLIFrameElement>('.map-modal__frame');
+    if (mapFrame) {
+      mapFrame.src = buildOpenStreetMapEmbed(pet.latitude, pet.longitude);
     }
 
     modal.classList.add('map-modal--open');
-    document.body.style.overflow = 'hidden';
+    lockBodyScroll();
     document.addEventListener('keydown', this._onEsc);
   }
 
@@ -509,7 +529,7 @@ export class AnimalPage extends HTMLElement {
     if (!modal) return;
 
     modal.classList.remove('map-modal--open');
-    document.body.style.overflow = '';
+    unlockBodyScroll();
     document.removeEventListener('keydown', this._onEsc);
   }
 }

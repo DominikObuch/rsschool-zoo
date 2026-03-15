@@ -1,6 +1,6 @@
 import { AnimalSlug, type ProductImageSet } from '../types.ts';
 
-const FALLBACK_ID = 1;
+const FALLBACK_ID = 0;
 
 const productIdBySlug: Record<AnimalSlug, number> = {
   [AnimalSlug.Panda]: 1,
@@ -10,6 +10,12 @@ const productIdBySlug: Record<AnimalSlug, number> = {
 };
 
 const productImagesById: Record<number, ProductImageSet> = {
+  0: {
+    id: 0,
+    main: '/images/Placeholder.png',
+    profile: '/images/Placeholder.png',
+    thumbs: ['/images/Placeholder.png', '/images/Placeholder.png', '/images/Placeholder.png'],
+  },
   1: {
     id: 1,
     main: '/images/products/1/main.png',

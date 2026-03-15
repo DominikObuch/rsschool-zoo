@@ -49,7 +49,7 @@ function buildReviewCard(item: FeedbackItemDto): HTMLElement {
 
 async function initLandingData(): Promise<void> {
   const petsSlider = document.querySelector<HTMLElement>('zoo-slider.pets__slider');
-  const reviewsSlider = document.querySelector<HTMLElement>('.reviews__slider-wrap zoo-slider');
+  const reviewsSlider = document.querySelector<HTMLElement>('zoo-slider.reviews__slider');
 
   if (!petsSlider || !reviewsSlider) return;
 

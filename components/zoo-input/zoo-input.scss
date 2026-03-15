@@ -47,6 +47,11 @@
       background:   color.change($color-orange, $alpha: 0.10);
       border-color: $color-orange;
       box-shadow:   none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23F58021' stroke-width='2.6' stroke-linecap='round'%3E%3Cpath d='M18 6L6 18'/%3E%3Cpath d='M6 6l12 12'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+      background-size: 14px 14px;
+      padding-right: 40px;
 
       &:focus {
         border-color: $color-orange;

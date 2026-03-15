@@ -4,6 +4,7 @@ import { petsService } from '../../src/api/services/pets.service.ts';
 import { authService } from '../../src/api/services/auth.service.ts';
 import { donationsService } from '../../src/api/services/donations.service.ts';
 import { authTokenStorage } from '../../src/utils/auth-token.ts';
+import { lockBodyScroll, unlockBodyScroll } from '../../src/utils/body-scroll-lock.ts';
 import type { PetDto } from '../../src/api/models/pets.dto.ts';
 
 const AMOUNTS_STEP1: string[] = ['$10', '$20', '$30', '$50', '$80', '$100'];
@@ -14,6 +15,8 @@ type Step = 1 | 2 | 3;
 interface StoredCard {
   id: string;
   masked: string;
+  cardNumber?: string;
+  cvv?: string;
   expMonth: string;
   expYear: string;
 }
@@ -64,10 +67,9 @@ function buildStep1(): HTMLDivElement {
   amountLabel.textContent = 'Choose your donation amount:';
 
   const amounts = el('div', 'feed-popup__amounts');
-  AMOUNTS_STEP1.forEach((label, index) => {
+  AMOUNTS_STEP1.forEach((label) => {
     const btn = document.createElement('zoo-amount-btn');
     btn.setAttribute('label', label);
-    if (index === 0) btn.setAttribute('active', '');
     amounts.appendChild(btn);
   });
 
@@ -345,6 +347,7 @@ buildTemplate();
 
 export class FeedPopup extends HTMLElement {
   private _root: HTMLDivElement | null = null;
+  private _isOpen = false;
   private _step: Step = 1;
   private _pets: PetDto[] = [];
   private _userId: string | null = null;
@@ -375,9 +378,13 @@ export class FeedPopup extends HTMLElement {
     this._goTo(1);
   }
 
+  disconnectedCallback(): void {
+    if (this._isOpen) this.close();
+  }
+
   private _initialState(): DonationFormState {
     return {
-      amount: 10,
+      amount: null,
       petId: null,
       monthly: false,
       name: '',
@@ -417,6 +424,8 @@ export class FeedPopup extends HTMLElement {
     this._root.querySelector('.feed-popup__backdrop')?.addEventListener('click', (e: Event) => {
       if (e.target === this._root?.querySelector('.feed-popup__backdrop')) this.close();
     });
+
+    this._syncButtons();
   }
 
   private _wireFieldClearErrors(): void {
@@ -425,18 +434,25 @@ export class FeedPopup extends HTMLElement {
     this._root.querySelectorAll('zoo-input').forEach((input) => {
       input.addEventListener('input', () => {
         input.removeAttribute('error');
+        this._syncButtons();
+      });
+
+      input.addEventListener('change', () => {
+        this._syncButtons();
       });
     });
 
     this._root.querySelectorAll<HTMLSelectElement>('select').forEach((select) => {
       select.addEventListener('change', () => {
         select.classList.remove('feed-popup__select--error');
+        this._syncButtons();
       });
     });
 
     const otherInput = this._root.querySelector<HTMLInputElement>('.feed-popup__other input');
     otherInput?.addEventListener('input', () => {
       otherInput.classList.remove('feed-popup__field--error');
+      this._syncButtons();
     });
   }
 
@@ -461,6 +477,7 @@ export class FeedPopup extends HTMLElement {
         btn.setAttribute('active', '');
         const label = btn.getAttribute('label') ?? '$0';
         this._state.amount = Number(label.replace(/[^\d]/g, ''));
+        this._syncButtons();
       });
     });
 
@@ -469,10 +486,12 @@ export class FeedPopup extends HTMLElement {
       otherAmountBtn.setAttribute('active', '');
       otherInput?.focus();
       this._state.amount = null;
+      this._syncButtons();
     });
 
     otherInput?.addEventListener('keydown', (e: KeyboardEvent) => {
-      if (e.key.toLowerCase() === 'e') e.preventDefault();
+      const key = e.key.toLowerCase();
+      if (key === 'e' || key === '+' || key === '-' || key === '.') e.preventDefault();
     });
 
     otherInput?.addEventListener('input', () => {
@@ -480,6 +499,7 @@ export class FeedPopup extends HTMLElement {
       const digits = raw.replace(/[^\d]/g, '');
       if (raw !== digits) otherInput.value = digits;
       this._state.amount = digits ? Number(digits) : null;
+      this._syncButtons();
     });
 
     const specialBtn = step1.querySelector<HTMLElement>('.feed-popup__special-pet-btn');
@@ -515,11 +535,75 @@ export class FeedPopup extends HTMLElement {
       }
 
       dropdown.classList.remove('feed-popup__dropdown--open');
+      this._syncButtons();
     });
 
     step1.querySelector<HTMLInputElement>('#feed-monthly-gift')?.addEventListener('change', (e: Event) => {
       this._state.monthly = (e.target as HTMLInputElement).checked;
     });
+
+    this._syncButtons();
+  }
+
+  private _setButtonDisabled(selector: string, disabled: boolean): void {
+    const btn = this._root?.querySelector<HTMLElement>(selector);
+    if (!btn) return;
+    if (disabled) btn.setAttribute('disabled', '');
+    else btn.removeAttribute('disabled');
+  }
+
+  private _isStep1Ready(): boolean {
+    const hasValidAmount = Number.isFinite(this._state.amount) && (this._state.amount ?? 0) > 0;
+    const hasPet = Number.isFinite(this._state.petId) && (this._state.petId ?? 0) > 0;
+    return hasValidAmount && hasPet;
+  }
+
+  private _isStep2Ready(): boolean {
+    const nameInput = this._root?.querySelector<HTMLElement>('zoo-input[name="billing-name"]') as (HTMLElement & { value: string }) | null;
+    const emailInput = this._root?.querySelector<HTMLElement>('zoo-input[name="billing-email"]') as (HTMLElement & { value: string }) | null;
+
+    const name = nameInput?.value.trim() ?? '';
+    const email = emailInput?.value.trim() ?? '';
+    const nameRegex = /^[A-Za-z\s]+$/;
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return nameRegex.test(name) && emailRegex.test(email);
+  }
+
+  private _isStep3Ready(): boolean {
+    const cardInput = this._root?.querySelector<HTMLElement>('zoo-input[name="card-number"]') as (HTMLElement & { value: string }) | null;
+    const cvvInput = this._root?.querySelector<HTMLElement>('zoo-input[name="cvv"]') as (HTMLElement & { value: string }) | null;
+    const monthSelect = this._root?.querySelector<HTMLSelectElement>('select[name="exp-month"]');
+    const yearSelect = this._root?.querySelector<HTMLSelectElement>('select[name="exp-year"]');
+
+    const cardDigits = (cardInput?.value ?? '').replace(/\D/g, '');
+    const cvv = (cvvInput?.value ?? '').trim();
+    const expMonth = monthSelect?.value ?? '';
+    const expYear = yearSelect?.value ?? '';
+
+    if (!/^\d{16}$/.test(cardDigits)) return false;
+    if (!/^\d{3}$/.test(cvv)) return false;
+    if (!expMonth || !expYear) return false;
+
+    const now = new Date();
+    const selected = new Date(Number(expYear), Number(expMonth), 0);
+    const current = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+    return selected > current;
+  }
+
+  private _syncButtons(): void {
+    if (!this._root) return;
+    const activeStep = this._root.querySelector<HTMLElement>(`[data-step="${this._step}"]`);
+    const nextInStep = activeStep?.querySelector<HTMLElement>('.feed-popup__next-btn[data-action="next"]') ?? null;
+    if (nextInStep) {
+      if (this._step === 1 ? !this._isStep1Ready() : !this._isStep2Ready()) nextInStep.setAttribute('disabled', '');
+      else nextInStep.removeAttribute('disabled');
+    }
+
+    this._root.querySelectorAll<HTMLElement>('.feed-popup__next-btn[data-action="next"]').forEach((btn) => {
+      if (btn !== nextInStep) btn.setAttribute('disabled', '');
+    });
+
+    this._setButtonDisabled('.feed-popup__complete-btn', !this._isStep3Ready());
   }
 
   private _setStepError(step: Step, message: string): void {
@@ -598,9 +682,11 @@ export class FeedPopup extends HTMLElement {
         this._savedCards = this._loadStoredCardsForUser(this._userId);
         this._renderStoredCards();
         this._toggleLoggedOnlyRows(true);
+        this._syncButtons();
       })
       .catch(() => {
         this._toggleLoggedOnlyRows(false);
+        this._syncButtons();
       });
   }
 
@@ -608,7 +694,7 @@ export class FeedPopup extends HTMLElement {
     const saved = this._root?.querySelector<HTMLElement>('.feed-popup__saved-cards');
     const saveRow = this._root?.querySelector<HTMLElement>('.feed-popup__save-card-row');
 
-    if (saved) saved.style.display = visible ? '' : 'none';
+    if (saved) saved.style.display = visible && this._savedCards.length > 0 ? '' : 'none';
     if (saveRow) saveRow.style.display = visible ? '' : 'none';
   }
 
@@ -639,13 +725,20 @@ export class FeedPopup extends HTMLElement {
       if (!selected) return;
 
       const cardInput = this._root?.querySelector<HTMLElement>('zoo-input[name="card-number"]') as (HTMLElement & { value: string }) | null;
-      if (cardInput) cardInput.value = selected.masked;
+      if (cardInput) cardInput.value = selected.cardNumber ?? selected.masked;
+
+      const cvvInput = this._root?.querySelector<HTMLElement>('zoo-input[name="cvv"]') as (HTMLElement & { value: string }) | null;
+      if (cvvInput) cvvInput.value = selected.cvv ?? '';
 
       const monthSelect = this._root?.querySelector<HTMLSelectElement>('select[name="exp-month"]');
       const yearSelect = this._root?.querySelector<HTMLSelectElement>('select[name="exp-year"]');
       if (monthSelect) monthSelect.value = selected.expMonth;
       if (yearSelect) yearSelect.value = selected.expYear;
+
+      this._syncButtons();
     };
+
+    this._toggleLoggedOnlyRows(this._isLoggedIn);
   }
 
   private _loadStoredCardsForUser(userId: string): StoredCard[] {
@@ -712,7 +805,7 @@ export class FeedPopup extends HTMLElement {
     const name = nameInput?.value.trim() ?? '';
     const email = emailInput?.value.trim() ?? '';
 
-    const nameRegex = /^[A-Za-z\s'-]+$/;
+    const nameRegex = /^[A-Za-z\s]+$/;
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
     let valid = true;
@@ -750,12 +843,11 @@ export class FeedPopup extends HTMLElement {
     const expMonth = monthSelect?.value ?? '';
     const expYear = yearSelect?.value ?? '';
 
-    const cardDigits = cardRaw.replace(/\s+/g, '');
-    const maskedRegex = /^\*{4}\s\*{4}\s\*{4}\s\d{4}$/;
+    const cardDigits = cardRaw.replace(/\D/g, '');
 
     let valid = true;
 
-    if (!/^\d{16}$/.test(cardDigits) && !maskedRegex.test(cardRaw)) {
+    if (!/^\d{16}$/.test(cardDigits)) {
       cardInput?.setAttribute('error', 'Card number must be 16 digits.');
       valid = false;
     }
@@ -785,7 +877,7 @@ export class FeedPopup extends HTMLElement {
       return false;
     }
 
-    this._state.cardNumber = cardRaw;
+    this._state.cardNumber = cardDigits;
     this._state.cvv = cvv;
     this._state.expMonth = expMonth;
     this._state.expYear = expYear;
@@ -794,8 +886,9 @@ export class FeedPopup extends HTMLElement {
 
   private _maskCard(cardNumber: string): string {
     const digits = cardNumber.replace(/\D/g, '');
+    const first4 = digits.slice(0, 4);
     const last4 = digits.slice(-4);
-    return `**** **** **** ${last4}`;
+    return `${first4} **** **** ${last4}`;
   }
 
   private _saveCardIfNeeded(): void {
@@ -808,6 +901,8 @@ export class FeedPopup extends HTMLElement {
     const card: StoredCard = {
       id: `${Date.now()}-${Math.random().toString(16).slice(2)}`,
       masked,
+      cardNumber: this._state.cardNumber.replace(/\D/g, ''),
+      cvv: this._state.cvv,
       expMonth: this._state.expMonth,
       expYear: this._state.expYear,
     };
@@ -816,6 +911,7 @@ export class FeedPopup extends HTMLElement {
     this._savedCards = nextCards;
     this._saveStoredCardsForUser(this._userId, nextCards);
     this._renderStoredCards();
+    this._toggleLoggedOnlyRows(true);
   }
 
   private async _completeDonation(): Promise<void> {
@@ -839,15 +935,17 @@ export class FeedPopup extends HTMLElement {
       });
 
       this._saveCardIfNeeded();
-      this._showSuccess('Donation completed successfully. Thank you!');
+      const petName = this._pets.find((pet) => pet.id === this._state.petId)?.name ?? 'selected pet';
+      this._showSuccess(`Thank you for your donation of ${this._state.amount} to ${petName}!`);
 
       window.setTimeout(() => {
         this.close();
       }, 800);
     } catch {
-      this._setStepError(3, 'Failed to complete donation. Please try again.');
+      this._setStepError(3, 'Something went wrong. Please, try again later.');
     } finally {
       if (completeBtn) completeBtn.disabled = false;
+      this._syncButtons();
     }
   }
 
@@ -863,6 +961,7 @@ export class FeedPopup extends HTMLElement {
 
     if (step === 2) this._applyStep2Values();
     if (step === 3) this._renderStoredCards();
+    this._syncButtons();
   }
 
   private _resetUi(): void {
@@ -879,9 +978,8 @@ export class FeedPopup extends HTMLElement {
       otherInput.classList.remove('feed-popup__field--error');
     }
 
-    this._root.querySelectorAll<HTMLElement>('.feed-popup__amounts zoo-amount-btn').forEach((btn, index) => {
-      if (index === 0) btn.setAttribute('active', '');
-      else btn.removeAttribute('active');
+    this._root.querySelectorAll<HTMLElement>('.feed-popup__amounts zoo-amount-btn').forEach((btn) => {
+      btn.removeAttribute('active');
     });
     this._root.querySelector<HTMLElement>('.feed-popup__other zoo-amount-btn')?.removeAttribute('active');
 
@@ -905,6 +1003,8 @@ export class FeedPopup extends HTMLElement {
 
     const saveCard = this._root.querySelector<HTMLInputElement>('#feed-save-card');
     if (saveCard) saveCard.checked = false;
+
+    this._syncButtons();
   }
 
   open(step: number = 1): void {
@@ -917,25 +1017,35 @@ export class FeedPopup extends HTMLElement {
     this._clearStepError(3);
     this._clearSuccess();
 
+    if (this._isOpen) {
+      this._goTo(normalized);
+      this._syncButtons();
+      return;
+    }
+
+    this._isOpen = true;
     this._root.classList.add('feed-popup--open');
-    document.body.style.overflow = 'hidden';
+    lockBodyScroll();
     document.addEventListener('keydown', this._onKeydown);
 
     void this._loadPets();
     this._readProfileAndCards();
     this._goTo(normalized);
+    this._syncButtons();
   }
 
   close(): void {
-    if (!this._root) return;
+    if (!this._root || !this._isOpen) return;
 
+    this._isOpen = false;
     this._root.classList.remove('feed-popup--open');
-    document.body.style.overflow = '';
+    unlockBodyScroll();
     document.removeEventListener('keydown', this._onKeydown);
 
     this._state = this._initialState();
     this._resetUi();
     this._goTo(1);
+    this._syncButtons();
   }
 
   setAmount(value: string): void {
@@ -953,6 +1063,7 @@ export class FeedPopup extends HTMLElement {
 
     otherBtn.setAttribute('active', '');
     this._state.amount = digits ? Number(digits) : null;
+    this._syncButtons();
   }
 }
 

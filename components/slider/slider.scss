@@ -19,17 +19,17 @@
     display:         flex;
     align-items:     center;
     justify-content: center;
-    width:           44px;
-    height:          44px;
-    border:          2px solid var(--slider-btn-color, #{$color-black});
+    width:           var(--slider-btn-size, 44px);
+    height:          var(--slider-btn-size, 44px);
+    border:          var(--slider-btn-border, 2px) solid var(--slider-btn-color, #{$color-black});
     background:      transparent;
-    border-radius:   4px;
+    border-radius:   var(--slider-btn-radius, 4px);
     cursor:          pointer;
     padding:         0;
     transition:      background-color $transition-base, border-color $transition-base;
 
     &::after {
-      @include arrow-svg(16px, 14px);
+      @include arrow-svg(var(--slider-arrow-w, 16px), var(--slider-arrow-h, 14px));
       background-color: var(--slider-btn-color, #{$color-black});
     }
 

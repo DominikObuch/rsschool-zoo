@@ -2,6 +2,7 @@ import styles from './header.scss?inline';
 import type { NavItem, SocialItem } from '../../src/types.ts';
 import { authService } from '../../src/api/services/auth.service.ts';
 import { authTokenStorage } from '../../src/utils/auth-token.ts';
+import { authProfileStorage } from '../../src/utils/auth-profile.ts';
 import type { ApiErrorResponseDto } from '../../src/api/models/common.dto.ts';
 
 const NAV_ITEMS: NavItem[] = [
@@ -92,18 +93,46 @@ function buildTemplate(): void {
   authToggle.setAttribute('aria-label', 'Open account menu');
   authToggle.setAttribute('aria-expanded', 'false');
 
-  const authAvatar = document.createElement('span');
-  authAvatar.className = 'header__auth-avatar';
-  authAvatar.textContent = '?';
+  const authIcon = document.createElement('span');
+  authIcon.className = 'header__auth-icon';
+
+  const iconSvg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  iconSvg.setAttribute('viewBox', '0 0 24 24');
+  iconSvg.setAttribute('width', '20');
+  iconSvg.setAttribute('height', '20');
+  iconSvg.setAttribute('aria-hidden', 'true');
+
+  const head = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+  head.setAttribute('cx', '12');
+  head.setAttribute('cy', '8');
+  head.setAttribute('r', '3.4');
+
+  const body = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+  body.setAttribute('d', 'M5.5 19.5c0-3.4 2.9-5.8 6.5-5.8s6.5 2.4 6.5 5.8');
+
+  iconSvg.append(head, body);
+  authIcon.appendChild(iconSvg);
 
   const authName = document.createElement('span');
   authName.className = 'header__auth-name';
 
-  authToggle.append(authAvatar, authName);
+  authToggle.append(authIcon, authName);
 
   const authMenu = document.createElement('div');
   authMenu.className = 'header__auth-menu';
   authMenu.hidden = true;
+
+  const profile = document.createElement('div');
+  profile.className = 'header__auth-profile';
+  profile.hidden = true;
+
+  const profileName = document.createElement('p');
+  profileName.className = 'header__auth-profile-name';
+
+  const profileEmail = document.createElement('p');
+  profileEmail.className = 'header__auth-profile-email';
+
+  profile.append(profileName, profileEmail);
 
   const signInLink = document.createElement('a');
   signInLink.className = 'header__auth-link header__auth-link--signin';
@@ -113,14 +142,14 @@ function buildTemplate(): void {
   const registerLink = document.createElement('a');
   registerLink.className = 'header__auth-link header__auth-link--register';
   registerLink.href = '../../pages/register/index.html';
-  registerLink.textContent = 'Register';
+  registerLink.textContent = 'Registration';
 
   const signOutButton = document.createElement('button');
   signOutButton.className = 'header__auth-signout';
   signOutButton.type = 'button';
   signOutButton.textContent = 'Sign Out';
 
-  authMenu.append(signInLink, registerLink, signOutButton);
+  authMenu.append(profile, signInLink, registerLink, signOutButton);
   auth.append(authToggle, authMenu);
 
   const burger = document.createElement('button');
@@ -220,6 +249,7 @@ export class ZooHeader extends HTMLElement {
 
     signOutButton.addEventListener('click', () => {
       authTokenStorage.clear();
+      authProfileStorage.clear();
       this._renderGuestState();
       menu.hidden = true;
       toggle.setAttribute('aria-expanded', 'false');
@@ -240,19 +270,45 @@ export class ZooHeader extends HTMLElement {
   private async _hydrateAuthState(): Promise<void> {
     const token = authTokenStorage.get();
     if (!token) {
+      authProfileStorage.clear();
       this._renderGuestState();
       return;
     }
 
+    const cached = authProfileStorage.get();
+    if (cached) {
+      this._renderUserState(cached.name, cached.email);
+    }
+
     try {
       const response = await authService.getProfile();
-      this._renderUserState(response.data.name);
+
+      const rawProfile = response.data as Partial<{ name: string; email: string; login: string }>;
+      const name = (rawProfile.name ?? rawProfile.login ?? '').trim();
+      const email = (rawProfile.email ?? '').trim();
+
+      if (!name) {
+        this._renderGuestState();
+        return;
+      }
+
+      const normalizedEmail = email || cached?.email || '';
+      this._renderUserState(name, normalizedEmail);
+      authProfileStorage.set({
+        name,
+        email: normalizedEmail,
+        login: rawProfile.login,
+      });
     } catch (error: unknown) {
       const statusCode = (error as ApiErrorResponseDto | null)?.statusCode;
       if (statusCode === 401 || statusCode === 403) {
         authTokenStorage.clear();
+        authProfileStorage.clear();
+        this._renderGuestState();
+        return;
       }
-      this._renderGuestState();
+
+      if (!cached) this._renderGuestState();
     }
   }
 
@@ -261,37 +317,44 @@ export class ZooHeader extends HTMLElement {
     if (!root) return;
 
     const auth = root.querySelector<HTMLElement>('.header__auth');
-    const avatar = root.querySelector<HTMLElement>('.header__auth-avatar');
     const name = root.querySelector<HTMLElement>('.header__auth-name');
+    const profile = root.querySelector<HTMLElement>('.header__auth-profile');
+    const profileName = root.querySelector<HTMLElement>('.header__auth-profile-name');
+    const profileEmail = root.querySelector<HTMLElement>('.header__auth-profile-email');
     const signIn = root.querySelector<HTMLElement>('.header__auth-link--signin');
     const register = root.querySelector<HTMLElement>('.header__auth-link--register');
     const signOut = root.querySelector<HTMLElement>('.header__auth-signout');
 
     auth?.classList.remove('header__auth--user');
-    if (avatar) avatar.textContent = '?';
     if (name) name.textContent = '';
+    if (profile) profile.hidden = true;
+    if (profileName) profileName.textContent = '';
+    if (profileEmail) profileEmail.textContent = '';
     if (signIn) signIn.hidden = false;
     if (register) register.hidden = false;
     if (signOut) signOut.hidden = true;
   }
 
-  private _renderUserState(displayName: string): void {
+  private _renderUserState(displayName: string, email: string): void {
     const root = this.shadowRoot;
     if (!root) return;
 
     const auth = root.querySelector<HTMLElement>('.header__auth');
-    const avatar = root.querySelector<HTMLElement>('.header__auth-avatar');
     const name = root.querySelector<HTMLElement>('.header__auth-name');
+    const profile = root.querySelector<HTMLElement>('.header__auth-profile');
+    const profileName = root.querySelector<HTMLElement>('.header__auth-profile-name');
+    const profileEmail = root.querySelector<HTMLElement>('.header__auth-profile-email');
     const signIn = root.querySelector<HTMLElement>('.header__auth-link--signin');
     const register = root.querySelector<HTMLElement>('.header__auth-link--register');
     const signOut = root.querySelector<HTMLElement>('.header__auth-signout');
 
     const normalizedName = displayName.trim();
-    const avatarLabel = normalizedName.charAt(0).toUpperCase() || 'U';
 
     auth?.classList.add('header__auth--user');
-    if (avatar) avatar.textContent = avatarLabel;
     if (name) name.textContent = normalizedName;
+    if (profile) profile.hidden = false;
+    if (profileName) profileName.textContent = normalizedName;
+    if (profileEmail) profileEmail.textContent = email.trim();
     if (signIn) signIn.hidden = true;
     if (register) register.hidden = true;
     if (signOut) signOut.hidden = false;

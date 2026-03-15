@@ -1,5 +1,6 @@
 import styles from './donate-popup.scss?inline';
 import '../amount-btn/amount-btn.ts';
+import { lockBodyScroll, unlockBodyScroll } from '../../src/utils/body-scroll-lock.ts';
 
 // ─── <donate-popup> ───────────────────────────────────────────────────────────
 // API:
@@ -58,6 +59,8 @@ function buildTemplate(): void {
 buildTemplate();
 
 export class DonatePopup extends HTMLElement {
+  private _isOpen = false;
+
   private readonly _onKeydown: (e: KeyboardEvent) => void = (e: KeyboardEvent) => {
     if (e.key === 'Escape') this.close();
   };
@@ -83,17 +86,27 @@ export class DonatePopup extends HTMLElement {
     });
   }
 
+  disconnectedCallback(): void {
+    this.close();
+  }
+
   open(): void {
+    if (this._isOpen) return;
     const popup = this.shadowRoot?.querySelector('.donate-popup');
     if (!popup) return;
+
+    this._isOpen = true;
     popup.classList.add('donate-popup--open');
-    document.body.style.overflow = 'hidden';
+    lockBodyScroll();
     document.addEventListener('keydown', this._onKeydown);
   }
 
   close(): void {
+    if (!this._isOpen) return;
+    this._isOpen = false;
+
     this.shadowRoot?.querySelector('.donate-popup')?.classList.remove('donate-popup--open');
-    document.body.style.overflow = '';
+    unlockBodyScroll();
     document.removeEventListener('keydown', this._onKeydown);
   }
 }

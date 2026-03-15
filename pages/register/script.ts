@@ -4,11 +4,12 @@ import type { ZooInput } from '../../components/zoo-input/zoo-input.ts';
 import type { ApiErrorResponseDto } from '../../src/api/models/common.dto.ts';
 import { authService } from '../../src/api/services/auth.service.ts';
 import { authTokenStorage } from '../../src/utils/auth-token.ts';
+import { authProfileStorage } from '../../src/utils/auth-profile.ts';
 
-const NAME_PATTERN = /^[A-Za-z][A-Za-z\s'-]{1,49}$/;
-const LOGIN_PATTERN = /^[A-Za-z0-9._-]{3,24}$/;
+const NAME_PATTERN = /^[A-Za-z]{3,}$/;
+const LOGIN_PATTERN = /^[A-Za-z][A-Za-z]{2,}$/;
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-const PASSWORD_PATTERN = /^(?=.*[!@#$%^&*()[\]{}\\|;:'\",.<>/?`~_\-+=]).{8,}$/;
+const PASSWORD_PATTERN = /^(?=.*[^A-Za-z0-9]).{6,}$/;
 
 function getApiError(error: unknown): { statusCode?: number; message: string } {
   if (typeof error === 'object' && error !== null) {
@@ -25,14 +26,14 @@ function getApiError(error: unknown): { statusCode?: number; message: string } {
 function validateName(value: string): string | null {
   const normalized = value.trim();
   if (!normalized) return 'Name is required';
-  if (!NAME_PATTERN.test(normalized)) return 'Use letters, spaces, apostrophe or dash (2-50 chars)';
+  if (!NAME_PATTERN.test(normalized)) return 'Name must contain only English letters and be at least 3 characters.';
   return null;
 }
 
 function validateLogin(value: string): string | null {
   const normalized = value.trim();
   if (!normalized) return 'Login is required';
-  if (!LOGIN_PATTERN.test(normalized)) return 'Login must be 3-24 chars: letters, numbers, dot, underscore or dash';
+  if (!LOGIN_PATTERN.test(normalized)) return 'Login must start with a letter and contain only English letters (min 3).';
   return null;
 }
 
@@ -45,7 +46,7 @@ function validateEmail(value: string): string | null {
 
 function validatePassword(value: string): string | null {
   if (!value) return 'Password is required';
-  if (!PASSWORD_PATTERN.test(value)) return 'Password must be at least 8 chars and include 1 special character';
+  if (!PASSWORD_PATTERN.test(value)) return 'Password must be at least 6 chars and include 1 special character.';
   return null;
 }
 
@@ -65,7 +66,26 @@ if (form) {
   const confirmPasswordInput = form.querySelector<ZooInput>('zoo-input[name="confirmPassword"]');
 
   const errorEl = form.querySelector<HTMLElement>('#register-form-error');
-  const submitBtn = form.querySelector('zoo-btn');
+  const submitBtn = form.querySelector<HTMLElement>('zoo-btn');
+
+  const syncSubmitState = (): void => {
+    const valid = Boolean(
+      nameInput
+      && loginInput
+      && emailInput
+      && passwordInput
+      && confirmPasswordInput
+      && validateName(nameInput.value) === null
+      && validateLogin(loginInput.value) === null
+      && validateEmail(emailInput.value) === null
+      && validatePassword(passwordInput.value) === null
+      && validateConfirmPassword(passwordInput.value, confirmPasswordInput.value) === null,
+    );
+
+    if (!submitBtn) return;
+    if (valid) submitBtn.removeAttribute('disabled');
+    else submitBtn.setAttribute('disabled', '');
+  };
 
   const validateField = (input: ZooInput | null): boolean => {
     if (!input) return false;
@@ -103,6 +123,11 @@ if (form) {
     input.addEventListener('focus', () => {
       input.removeAttribute('error');
       if (errorEl) errorEl.textContent = '';
+      syncSubmitState();
+    });
+
+    input.addEventListener('input', () => {
+      syncSubmitState();
     });
   });
 
@@ -110,6 +135,7 @@ if (form) {
     if (confirmPasswordInput?.value) {
       validateField(confirmPasswordInput);
     }
+    syncSubmitState();
   });
 
   const submit = async (): Promise<void> => {
@@ -127,6 +153,13 @@ if (form) {
       });
 
       if (response.token) authTokenStorage.set(response.token);
+
+      authProfileStorage.set({
+        name: nameInput.value.trim(),
+        email: emailInput.value.trim(),
+        login: loginInput.value.trim(),
+      });
+
       window.location.href = '../landing/index.html';
     } catch (error: unknown) {
       const apiError = getApiError(error);
@@ -144,4 +177,6 @@ if (form) {
   submitBtn?.addEventListener('zoo-click', () => {
     void submit();
   });
+
+  syncSubmitState();
 }

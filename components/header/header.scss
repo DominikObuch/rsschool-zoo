@@ -92,7 +92,7 @@
     color: $color-black;
   }
 
-  &__auth-avatar {
+  &__auth-icon {
     width: 36px;
     height: 36px;
     border-radius: 50%;
@@ -101,9 +101,16 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    font-weight: $font-weight-bold;
-    text-transform: uppercase;
     color: $color-navy;
+
+    svg {
+      display: block;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 1.8;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
   }
 
   &__auth-name {
@@ -136,6 +143,34 @@
     flex-direction: column;
     gap: 8px;
     z-index: 150;
+  }
+
+  &__auth-profile {
+    border: 1px solid rgba(32, 17, 61, 0.14);
+    border-radius: 8px;
+    background: rgba(0, 160, 146, 0.08);
+    padding: 10px;
+  }
+
+  &__auth-profile-name,
+  &__auth-profile-email {
+    margin: 0;
+    font-family: $font-family-base;
+    color: $color-navy;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  &__auth-profile-name {
+    font-size: 0.8125rem;
+    font-weight: $font-weight-bold;
+  }
+
+  &__auth-profile-email {
+    margin-top: 4px;
+    font-size: 0.75rem;
+    opacity: 0.82;
   }
 
   &__auth-link,
@@ -292,7 +327,7 @@
       font-size: 0.8125rem;
     }
 
-    &__auth-avatar {
+    &__auth-icon {
       width: 34px;
       height: 34px;
     }
@@ -343,10 +378,9 @@
       font-size: 0.75rem;
     }
 
-    &__auth-avatar {
+    &__auth-icon {
       width: 30px;
       height: 30px;
-      font-size: 0.75rem;
     }
   }
 }

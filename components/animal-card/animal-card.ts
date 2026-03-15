@@ -1,5 +1,7 @@
 import styles from './animal-card.scss?inline';
 
+const PLACEHOLDER_IMAGE = '/images/Placeholder.png';
+
 const template = document.createElement('template');
 
 function buildTemplate(): void {
@@ -76,7 +78,14 @@ export class AnimalCard extends HTMLElement {
     const image = this.getAttribute('image') || '';
 
     if (link) link.href = href;
-    if (img) { img.src = image; img.alt = species; }
+    if (img) {
+      img.onerror = () => {
+        if (img.src.endsWith(PLACEHOLDER_IMAGE)) return;
+        img.src = PLACEHOLDER_IMAGE;
+      };
+      img.src = image || PLACEHOLDER_IMAGE;
+      img.alt = species;
+    }
     if (badge) badge.textContent = nickname;
     if (speciesEl) speciesEl.textContent = species;
     if (descEl) descEl.textContent = description;
