@@ -120,7 +120,6 @@ function buildTemplate(): void {
 
   const authMenu = document.createElement('div');
   authMenu.className = 'header__auth-menu';
-  authMenu.hidden = true;
 
   const profile = document.createElement('div');
   profile.className = 'header__auth-profile';
@@ -240,29 +239,39 @@ export class ZooHeader extends HTMLElement {
 
     if (!auth || !toggle || !menu || !signOutButton) return;
 
+    const setMenuOpen = (isOpen: boolean): void => {
+      menu.classList.toggle('header__auth-menu--open', isOpen);
+      menu.setAttribute('aria-hidden', String(!isOpen));
+      toggle.setAttribute('aria-expanded', String(isOpen));
+      toggle.setAttribute('aria-label', isOpen ? 'Close account menu' : 'Open account menu');
+    };
+
+    setMenuOpen(false);
+
     toggle.addEventListener('click', () => {
-      const nextOpen = menu.hidden;
-      menu.hidden = !nextOpen;
-      toggle.setAttribute('aria-expanded', String(nextOpen));
-      toggle.setAttribute('aria-label', nextOpen ? 'Close account menu' : 'Open account menu');
+      const nextOpen = !menu.classList.contains('header__auth-menu--open');
+      setMenuOpen(nextOpen);
+    });
+
+    menu.addEventListener('click', (event: Event) => {
+      const target = event.target as HTMLElement | null;
+      if (target?.closest('.header__auth-link')) {
+        setMenuOpen(false);
+      }
     });
 
     signOutButton.addEventListener('click', () => {
       authTokenStorage.clear();
       authProfileStorage.clear();
       this._renderGuestState();
-      menu.hidden = true;
-      toggle.setAttribute('aria-expanded', 'false');
-      toggle.setAttribute('aria-label', 'Open account menu');
+      setMenuOpen(false);
     });
 
     document.addEventListener('click', (event: MouseEvent) => {
-      if (menu.hidden) return;
+      if (!menu.classList.contains('header__auth-menu--open')) return;
       const path = event.composedPath();
       if (!path.includes(auth)) {
-        menu.hidden = true;
-        toggle.setAttribute('aria-expanded', 'false');
-        toggle.setAttribute('aria-label', 'Open account menu');
+        setMenuOpen(false);
       }
     });
   }
@@ -281,9 +290,21 @@ export class ZooHeader extends HTMLElement {
     }
 
     try {
-      const response = await authService.getProfile();
+      const response = await authService.getProfile(token);
 
-      const rawProfile = response.data as Partial<{ name: string; email: string; login: string }>;
+      const envelope = response as unknown as {
+        data?: {
+          name?: string;
+          email?: string;
+          login?: string;
+          user?: { name?: string; email?: string; login?: string };
+        };
+        user?: { name?: string; email?: string; login?: string };
+        name?: string;
+        email?: string;
+        login?: string;
+      };
+      const rawProfile = envelope.data?.user ?? envelope.user ?? envelope.data ?? envelope;
       const name = (rawProfile.name ?? rawProfile.login ?? '').trim();
       const email = (rawProfile.email ?? '').trim();
 

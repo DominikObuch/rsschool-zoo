@@ -8,6 +8,54 @@ import { authProfileStorage } from '../../src/utils/auth-profile.ts';
 const LOGIN_PATTERN = /^[A-Za-z][A-Za-z]{2,}$/;
 const PASSWORD_PATTERN = /^(?=.*[^A-Za-z0-9]).{6,}$/;
 
+type AuthLikeResponse = {
+  token?: string;
+  access_token?: string;
+  data?: {
+    token?: string;
+    access_token?: string;
+    name?: string;
+    email?: string;
+    login?: string;
+    user?: {
+      login?: string;
+      name?: string;
+      email?: string;
+    };
+  };
+  name?: string;
+  email?: string;
+  login?: string;
+  user?: {
+    login?: string;
+    name?: string;
+    email?: string;
+  };
+};
+
+function extractToken(response: unknown): string {
+  const payload = response as AuthLikeResponse;
+  return payload.token
+    ?? payload.access_token
+    ?? payload.data?.token
+    ?? payload.data?.access_token
+    ?? '';
+}
+
+function extractProfile(response: unknown): { name: string; email: string; login: string } | null {
+  const payload = response as AuthLikeResponse;
+  const candidate = payload.data?.user ?? payload.user ?? payload.data ?? payload;
+  const login = (candidate.login ?? '').trim();
+  const name = (candidate.name ?? login).trim();
+  const email = (candidate.email ?? '').trim();
+  if (!name && !login) return null;
+  return {
+    name: name || login,
+    email,
+    login: login || name,
+  };
+}
+
 function validateLogin(value: string): string | null {
   const normalized = value.trim();
   if (!normalized) return 'Login is required';
@@ -92,17 +140,20 @@ if (form) {
         password: passwordInput.value,
       });
 
-      authTokenStorage.set(response.token);
+      const token = extractToken(response);
+      if (!token) throw new Error('Missing auth token');
+
+      authTokenStorage.set(token);
+
+      const profileFromLogin = extractProfile(response);
+      if (profileFromLogin) authProfileStorage.set(profileFromLogin);
 
       // Prime header identity data right after successful auth.
       try {
-        const profileResponse = await authService.getProfile(response.token);
-        const profile = profileResponse.data;
-        authProfileStorage.set({
-          name: (profile.name || profile.login).trim(),
-          email: profile.email.trim(),
-          login: profile.login,
-        });
+        const profileResponse = await authService.getProfile(token);
+        const profile = extractProfile(profileResponse);
+        if (!profile) throw new Error('Missing profile');
+        authProfileStorage.set(profile);
       } catch {
         authProfileStorage.set({
           name: loginInput.value.trim(),

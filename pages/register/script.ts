@@ -11,6 +11,24 @@ const LOGIN_PATTERN = /^[A-Za-z][A-Za-z]{2,}$/;
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const PASSWORD_PATTERN = /^(?=.*[^A-Za-z0-9]).{6,}$/;
 
+type AuthLikeResponse = {
+  token?: string;
+  access_token?: string;
+  data?: {
+    token?: string;
+    access_token?: string;
+  };
+};
+
+function extractToken(response: unknown): string {
+  const payload = response as AuthLikeResponse;
+  return payload.token
+    ?? payload.access_token
+    ?? payload.data?.token
+    ?? payload.data?.access_token
+    ?? '';
+}
+
 function getApiError(error: unknown): { statusCode?: number; message: string } {
   if (typeof error === 'object' && error !== null) {
     const apiError = error as ApiErrorResponseDto;
@@ -152,7 +170,8 @@ if (form) {
         password: passwordInput.value,
       });
 
-      if (response.token) authTokenStorage.set(response.token);
+      const token = extractToken(response);
+      if (token) authTokenStorage.set(token);
 
       authProfileStorage.set({
         name: nameInput.value.trim(),
