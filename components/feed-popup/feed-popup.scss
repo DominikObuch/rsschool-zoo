@@ -25,17 +25,38 @@
 .feed-popup__card {
   position: relative;
   background: $color-white;
-  border-radius: 10px;
+  border-radius: 0;
   overflow: hidden;
   width: 100%;
-  max-width: 460px;
+  max-width: 740px;
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.25);
+}
+
+.feed-popup__close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: 26px;
+  height: 26px;
+  border: none;
+  background: transparent;
+  color: $color-white;
+  font-size: 1.5rem;
+  line-height: 1;
+  cursor: pointer;
+  z-index: 2;
+  padding: 0;
+  transition: opacity $transition-base;
+
+  &:hover {
+    opacity: 0.75;
+  }
 }
 
 // ─── Header bar ───────────────────────────────────────────────────────────────
 .feed-popup__header {
   background: $color-orange;
-  padding: 20px 28px;
+  padding: 22px 28px;
 
   h2 {
     margin: 0;
@@ -49,15 +70,15 @@
 
 // ─── Body ─────────────────────────────────────────────────────────────────────
 .feed-popup__body {
-  padding: 24px 28px 28px;
+  padding: 20px 48px 28px;
 }
 
 .feed-popup__section-title {
-  font-size: 1rem;
+  font-size: 0.875rem;
   font-weight: $font-weight-bold;
   color: $color-navy;
   margin: 0 0 16px;
-  padding-bottom: 12px;
+  padding-bottom: 10px;
   border-bottom: 1px solid #e0e0e0;
 }
 
@@ -77,24 +98,24 @@
 .feed-popup__amounts {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: 12px;
   margin-bottom: 14px;
 
   zoo-amount-btn {
-    flex: 1 1 calc(16.666% - 8px);
-    min-width: 60px;
+    flex: 1 1 calc(16.666% - 12px);
+    min-width: 74px;
   }
 }
 
 // ─── Other amount row ──────────────────────────────────────────────────────────
 .feed-popup__other {
   display: flex;
-  gap: 10px;
+  gap: 14px;
   align-items: stretch;
   margin-bottom: 14px;
 
   zoo-amount-btn {
-    flex: 0 0 auto;
+    flex: 0 0 155px;
   }
 
   input {
@@ -130,12 +151,18 @@
 
 // ─── For Special Pet button ───────────────────────────────────────────────────
 .feed-popup__special-pet-wrap {
-  position: relative;
   margin-bottom: 14px;
 }
 
+.feed-popup__special-pet-row {
+  position: relative;
+  display: grid;
+  grid-template-columns: 155px 1fr;
+  gap: 14px;
+}
+
 .feed-popup__special-pet-btn {
-  width: 100%;
+  width: 155px;
   background: $color-turquoise;
   color: $color-white;
   border: none;
@@ -160,18 +187,25 @@
   border: 1px solid $color-turquoise;
   border-radius: $btn-border-radius;
   background: $color-white;
-  overflow: hidden;
-  display: none;
-  margin-bottom: 14px;
+  overflow: visible;
 
-  &--open {
-    display: block;
+  &--error {
+    border-color: $color-orange;
   }
 }
 
 .feed-popup__dropdown-inner {
-  max-height: 200px;
+  position: absolute;
+  left: -1px;
+  right: -1px;
+  top: calc(100% + 2px);
+  max-height: 220px;
   overflow-y: auto;
+  border: 1px solid $color-turquoise;
+  border-top: none;
+  background: $color-white;
+  z-index: 3;
+  display: none;
 
   &::-webkit-scrollbar {
     width: 6px;
@@ -187,6 +221,10 @@
   }
 }
 
+.feed-popup__dropdown--open .feed-popup__dropdown-inner {
+  display: block;
+}
+
 .feed-popup__dropdown-header {
   display: flex;
   align-items: center;
@@ -195,9 +233,9 @@
   cursor: pointer;
   font-size: 0.875rem;
   color: $color-navy;
-  border-bottom: 1px solid #e0e0e0;
   background: $color-white;
   user-select: none;
+  min-height: 44px;
 
   span {
     opacity: 0.6;
@@ -363,9 +401,13 @@
 .feed-popup__actions {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-end;
   gap: 12px;
   margin-top: 8px;
+
+  .feed-popup__dots {
+    margin-right: auto;
+  }
 }
 
 .feed-popup__back-btn {
@@ -387,7 +429,7 @@
 
 .feed-popup__next-btn,
 .feed-popup__complete-btn {
-  background: $color-orange;
+  background: $color-turquoise;
   color: $color-white;
   border: none;
   border-radius: $btn-border-radius;
@@ -404,7 +446,7 @@
   gap: 8px;
 
   &:hover {
-    background: color.adjust($color-black, $lightness: -12%);
+    background: $color-turquoise-dark;
   }
 
   .arrow {
@@ -421,6 +463,14 @@
   &:disabled {
     opacity: 0.5;
     cursor: not-allowed;
+  }
+}
+
+.feed-popup__complete-btn {
+  background: $color-orange;
+
+  &:hover {
+    background: $color-orange-dark;
   }
 }
 
@@ -447,6 +497,10 @@
     overflow-y: auto;
   }
 
+  .feed-popup__body {
+    padding: 20px 20px 24px;
+  }
+
   .feed-popup__amounts {
     zoo-amount-btn {
       flex: 1 1 calc(33.333% - 8px);
@@ -456,11 +510,20 @@
   .feed-popup__card-row {
     grid-template-columns: 1fr;
   }
+
+  .feed-popup__special-pet-row {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .feed-popup__special-pet-btn {
+    width: 100%;
+  }
 }
 
 @media (max-width: 320px) {
   .feed-popup__body {
-    padding: 16px 16px 20px;
+    padding: 16px;
   }
 
   .feed-popup__header {

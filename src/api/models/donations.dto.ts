@@ -5,7 +5,11 @@ export interface DonationRequestDto {
   petId: number;
 }
 
+export interface DonationSuccessDataDto {
+  message: string;
+  donationId: string;
+}
+
 export interface DonationSuccessResponseDto {
-  message?: string;
-  success?: boolean;
+  data: DonationSuccessDataDto;
 }

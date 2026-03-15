@@ -11,6 +11,11 @@ const AMOUNTS: string[] = ['$20', '$30', '$50', '$80', '$100', 'other amount'];
 
 const template = document.createElement('template');
 
+interface FeedPopupElement extends HTMLElement {
+  open(step?: number): void;
+  setAmount(value: string): void;
+}
+
 function buildTemplate(): void {
   const backdrop = document.createElement('div');
   backdrop.className = 'donate-popup__backdrop';
@@ -26,7 +31,7 @@ function buildTemplate(): void {
 
   const img = document.createElement('img');
   img.className = 'donate-popup__image';
-  img.src = '../../images/donate.png';
+  img.src = '/images/donate.png';
   img.alt = 'Hands touching a lion paw';
 
   const body = document.createElement('div');
@@ -83,6 +88,26 @@ export class DonatePopup extends HTMLElement {
 
     shadow.querySelector('.donate-popup__backdrop')?.addEventListener('click', (e: Event) => {
       if (e.target === shadow.querySelector('.donate-popup__backdrop')) this.close();
+    });
+
+    shadow.querySelector('.donate-popup__amounts')?.addEventListener('amount-select', (e: Event) => {
+      const custom = e as CustomEvent<{ label?: string }>;
+      const label = (custom.detail?.label ?? '').trim().toLowerCase();
+      const digits = label.replace(/[^\d]/g, '');
+
+      const feedPopup = document.getElementById('feed-popup') as FeedPopupElement | null;
+      if (feedPopup) {
+        if (digits) feedPopup.setAmount(digits);
+        feedPopup.open(1);
+      }
+
+      this.dispatchEvent(new CustomEvent('donate-amount-select', {
+        bubbles: true,
+        composed: true,
+        detail: { label },
+      }));
+
+      this.close();
     });
   }
 

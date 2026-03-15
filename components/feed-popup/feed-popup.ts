@@ -1,29 +1,14 @@
 import styles from './feed-popup.scss?inline';
 import '../amount-btn/amount-btn.ts';
+import '../zoo-input/zoo-input.ts';
 import { petsService } from '../../src/api/services/pets.service.ts';
-import { authService } from '../../src/api/services/auth.service.ts';
 import { donationsService } from '../../src/api/services/donations.service.ts';
-import { authTokenStorage } from '../../src/utils/auth-token.ts';
 import { lockBodyScroll, unlockBodyScroll } from '../../src/utils/body-scroll-lock.ts';
 import type { PetDto } from '../../src/api/models/pets.dto.ts';
 
 const AMOUNTS_STEP1: string[] = ['$10', '$20', '$30', '$50', '$80', '$100'];
-const STORED_CARDS_KEY = 'zoo:saved-cards';
 
 type Step = 1 | 2 | 3;
-
-interface StoredCard {
-  id: string;
-  masked: string;
-  cardNumber?: string;
-  cvv?: string;
-  expMonth: string;
-  expYear: string;
-}
-
-interface StoredCardsByUser {
-  [userId: string]: StoredCard[];
-}
 
 interface DonationFormState {
   amount: number | null;
@@ -35,6 +20,11 @@ interface DonationFormState {
   cvv: string;
   expMonth: string;
   expYear: string;
+}
+
+interface ApiLikeError {
+  message?: string;
+  error?: string;
 }
 
 function el<K extends keyof HTMLElementTagNameMap>(tag: K, cls?: string): HTMLElementTagNameMap[K] {
@@ -85,6 +75,7 @@ function buildStep1(): HTMLDivElement {
   otherRow.append(otherBtn, otherInput);
 
   const specialWrap = el('div', 'feed-popup__special-pet-wrap');
+  const specialRow = el('div', 'feed-popup__special-pet-row');
   const specialBtn = el('button', 'feed-popup__special-pet-btn');
   specialBtn.type = 'button';
   specialBtn.textContent = 'for special pet';
@@ -112,7 +103,8 @@ function buildStep1(): HTMLDivElement {
 
   const dropInner = el('div', 'feed-popup__dropdown-inner');
   dropdown.append(dropHeader, dropInner);
-  specialWrap.append(specialBtn, dropdown);
+  specialRow.append(specialBtn, dropdown);
+  specialWrap.appendChild(specialRow);
 
   const checkRow = el('div', 'feed-popup__checkbox-row');
   const checkbox = el('input');
@@ -166,14 +158,14 @@ function buildStep2(): HTMLDivElement {
   emailInput.setAttribute('name', 'billing-email');
   emailInput.setAttribute('required', '');
 
-  const infoText = el('p', 'feed-popup__info-text');
-  infoText.textContent = 'You will receive emails from the Online Zoo. You can unsubscribe at any time.';
-
   const error = el('p', 'feed-popup__message feed-popup__message--error');
   error.setAttribute('data-step-error', '2');
 
   const actions = el('div', 'feed-popup__actions');
-  const rightGroup = el('div', 'feed-popup__actions-right');
+  const backBtn = el('button', 'feed-popup__back-btn');
+  backBtn.type = 'button';
+  backBtn.dataset.action = 'back';
+  backBtn.textContent = 'Back';
 
   const nextBtn = el('button', 'feed-popup__next-btn');
   nextBtn.type = 'button';
@@ -183,15 +175,9 @@ function buildStep2(): HTMLDivElement {
   nextText.textContent = 'next';
   nextBtn.append(nextText, el('span', 'arrow'));
 
-  const backBtn = el('button', 'feed-popup__back-btn');
-  backBtn.type = 'button';
-  backBtn.dataset.action = 'back';
-  backBtn.textContent = 'Back';
+  actions.append(buildDots(2), backBtn, nextBtn);
 
-  rightGroup.append(nextBtn, backBtn);
-  actions.append(buildDots(2), rightGroup);
-
-  body.append(sectionTitle, nameInput, emailInput, infoText, error, actions);
+  body.append(sectionTitle, nameInput, emailInput, error, actions);
   step.appendChild(body);
   return step;
 }
@@ -204,20 +190,6 @@ function buildStep3(): HTMLDivElement {
 
   const sectionTitle = el('p', 'feed-popup__section-title');
   sectionTitle.textContent = 'Payment Information:';
-
-  const savedCardsWrap = el('div', 'feed-popup__saved-cards');
-  const savedLabel = el('label', 'feed-popup__saved-cards-label');
-  savedLabel.textContent = 'Saved cards';
-
-  const savedSelect = el('select', 'feed-popup__select feed-popup__saved-select') as HTMLSelectElement;
-  savedSelect.setAttribute('name', 'saved-card');
-  const savedDefault = el('option') as HTMLOptionElement;
-  savedDefault.value = '';
-  savedDefault.textContent = 'Choose saved card';
-  savedDefault.selected = true;
-  savedSelect.appendChild(savedDefault);
-
-  savedCardsWrap.append(savedLabel, savedSelect);
 
   const cardInput = document.createElement('zoo-input');
   cardInput.setAttribute('label', '* Credit Card Number');
@@ -288,16 +260,6 @@ function buildStep3(): HTMLDivElement {
   expirySelects.append(monthSelect, yearSelect);
   expiryRow.append(expiryLabel, expirySelects);
 
-  const saveCardRow = el('div', 'feed-popup__checkbox-row feed-popup__save-card-row');
-  const saveCheckbox = el('input') as HTMLInputElement;
-  saveCheckbox.type = 'checkbox';
-  saveCheckbox.id = 'feed-save-card';
-
-  const saveLabel2 = el('label');
-  saveLabel2.setAttribute('for', 'feed-save-card');
-  saveLabel2.textContent = 'Save card info for future donations';
-  saveCardRow.append(saveCheckbox, saveLabel2);
-
   const error = el('p', 'feed-popup__message feed-popup__message--error');
   error.setAttribute('data-step-error', '3');
 
@@ -305,7 +267,10 @@ function buildStep3(): HTMLDivElement {
   success.setAttribute('data-step-success', '1');
 
   const actions = el('div', 'feed-popup__actions');
-  const rightGroup = el('div', 'feed-popup__actions-right');
+  const backBtn = el('button', 'feed-popup__back-btn');
+  backBtn.type = 'button';
+  backBtn.dataset.action = 'back';
+  backBtn.textContent = 'Back';
 
   const completeBtn = el('button', 'feed-popup__complete-btn');
   completeBtn.type = 'button';
@@ -314,15 +279,9 @@ function buildStep3(): HTMLDivElement {
   completeText.textContent = 'complete donation';
   completeBtn.append(completeText, el('span', 'arrow'));
 
-  const backBtn = el('button', 'feed-popup__back-btn');
-  backBtn.type = 'button';
-  backBtn.dataset.action = 'back';
-  backBtn.textContent = 'Back';
+  actions.append(buildDots(3), backBtn, completeBtn);
 
-  rightGroup.append(completeBtn, backBtn);
-  actions.append(buildDots(3), rightGroup);
-
-  body.append(sectionTitle, savedCardsWrap, cardRow, expiryRow, saveCardRow, error, success, actions);
+  body.append(sectionTitle, cardRow, expiryRow, error, success, actions);
   step.appendChild(body);
   return step;
 }
@@ -333,12 +292,17 @@ function buildTemplate(): void {
   const backdrop = el('div', 'feed-popup__backdrop');
   const card = el('div', 'feed-popup__card');
 
+  const closeBtn = el('button', 'feed-popup__close');
+  closeBtn.type = 'button';
+  closeBtn.setAttribute('aria-label', 'Close popup');
+  closeBtn.textContent = '×';
+
   const header = el('div', 'feed-popup__header');
   const title = el('h2');
   title.textContent = 'make your donation';
   header.appendChild(title);
 
-  card.append(header, buildStep1(), buildStep2(), buildStep3());
+  card.append(closeBtn, header, buildStep1(), buildStep2(), buildStep3());
   backdrop.appendChild(card);
   template.content.appendChild(backdrop);
 }
@@ -350,9 +314,6 @@ export class FeedPopup extends HTMLElement {
   private _isOpen = false;
   private _step: Step = 1;
   private _pets: PetDto[] = [];
-  private _userId: string | null = null;
-  private _isLoggedIn = false;
-  private _savedCards: StoredCard[] = [];
   private _state: DonationFormState = this._initialState();
 
   private readonly _onKeydown = (e: KeyboardEvent): void => {
@@ -424,6 +385,8 @@ export class FeedPopup extends HTMLElement {
     this._root.querySelector('.feed-popup__backdrop')?.addEventListener('click', (e: Event) => {
       if (e.target === this._root?.querySelector('.feed-popup__backdrop')) this.close();
     });
+
+    this._root.querySelector('.feed-popup__close')?.addEventListener('click', () => this.close());
 
     this._syncButtons();
   }
@@ -504,11 +467,16 @@ export class FeedPopup extends HTMLElement {
 
     const specialBtn = step1.querySelector<HTMLElement>('.feed-popup__special-pet-btn');
     const dropdown = step1.querySelector<HTMLElement>('.feed-popup__dropdown');
+    const dropHeader = dropdown?.querySelector<HTMLElement>('.feed-popup__dropdown-header');
     const headerSpan = dropdown?.querySelector<HTMLElement>('.feed-popup__dropdown-header span');
 
-    specialBtn?.addEventListener('click', () => {
+    const toggleDropdown = (): void => {
       dropdown?.classList.toggle('feed-popup__dropdown--open');
-    });
+      dropdown?.classList.remove('feed-popup__dropdown--error');
+    };
+
+    specialBtn?.addEventListener('click', toggleDropdown);
+    dropHeader?.addEventListener('click', toggleDropdown);
 
     this._root.addEventListener('click', (e: Event) => {
       const target = e.target as Node | null;
@@ -528,6 +496,7 @@ export class FeedPopup extends HTMLElement {
 
       item.classList.add('feed-popup__dropdown-item--selected');
       this._state.petId = Number(item.dataset.petId);
+      dropdown?.classList.remove('feed-popup__dropdown--error');
 
       if (headerSpan) {
         headerSpan.textContent = item.textContent ?? 'Choose your favourite';
@@ -562,9 +531,9 @@ export class FeedPopup extends HTMLElement {
     const nameInput = this._root?.querySelector<HTMLElement>('zoo-input[name="billing-name"]') as (HTMLElement & { value: string }) | null;
     const emailInput = this._root?.querySelector<HTMLElement>('zoo-input[name="billing-email"]') as (HTMLElement & { value: string }) | null;
 
-    const name = nameInput?.value.trim() ?? '';
-    const email = emailInput?.value.trim() ?? '';
-    const nameRegex = /^[A-Za-z\s]+$/;
+    const name = (nameInput?.value ?? '').trim();
+    const email = (emailInput?.value ?? '').trim();
+    const nameRegex = /^[A-Za-z\s'-]+$/;
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return nameRegex.test(name) && emailRegex.test(email);
   }
@@ -659,114 +628,6 @@ export class FeedPopup extends HTMLElement {
     }
   }
 
-  private _readProfileAndCards(): void {
-    this._isLoggedIn = false;
-    this._userId = null;
-    this._savedCards = [];
-
-    const token = authTokenStorage.get();
-    if (!token) {
-      this._toggleLoggedOnlyRows(false);
-      return;
-    }
-
-    void authService.getProfile(token)
-      .then((response) => {
-        const profile = response.data;
-        this._isLoggedIn = true;
-        this._userId = String(profile.id ?? profile.login);
-        this._state.name = this._state.name || profile.name;
-        this._state.email = this._state.email || profile.email;
-        this._applyStep2Values();
-
-        this._savedCards = this._loadStoredCardsForUser(this._userId);
-        this._renderStoredCards();
-        this._toggleLoggedOnlyRows(true);
-        this._syncButtons();
-      })
-      .catch(() => {
-        this._toggleLoggedOnlyRows(false);
-        this._syncButtons();
-      });
-  }
-
-  private _toggleLoggedOnlyRows(visible: boolean): void {
-    const saved = this._root?.querySelector<HTMLElement>('.feed-popup__saved-cards');
-    const saveRow = this._root?.querySelector<HTMLElement>('.feed-popup__save-card-row');
-
-    if (saved) saved.style.display = visible && this._savedCards.length > 0 ? '' : 'none';
-    if (saveRow) saveRow.style.display = visible ? '' : 'none';
-  }
-
-  private _applyStep2Values(): void {
-    const nameInput = this._root?.querySelector<HTMLElement>('zoo-input[name="billing-name"]') as (HTMLElement & { value: string }) | null;
-    const emailInput = this._root?.querySelector<HTMLElement>('zoo-input[name="billing-email"]') as (HTMLElement & { value: string }) | null;
-
-    if (nameInput) nameInput.value = this._state.name;
-    if (emailInput) emailInput.value = this._state.email;
-  }
-
-  private _renderStoredCards(): void {
-    const select = this._root?.querySelector<HTMLSelectElement>('.feed-popup__saved-select');
-    if (!select) return;
-
-    const options = [select.options[0]];
-    select.replaceChildren(...options);
-
-    this._savedCards.forEach((card) => {
-      const option = el('option') as HTMLOptionElement;
-      option.value = card.id;
-      option.textContent = `${card.masked} (${card.expMonth}/${String(card.expYear).slice(-2)})`;
-      select.appendChild(option);
-    });
-
-    select.onchange = () => {
-      const selected = this._savedCards.find((item) => item.id === select.value);
-      if (!selected) return;
-
-      const cardInput = this._root?.querySelector<HTMLElement>('zoo-input[name="card-number"]') as (HTMLElement & { value: string }) | null;
-      if (cardInput) cardInput.value = selected.cardNumber ?? selected.masked;
-
-      const cvvInput = this._root?.querySelector<HTMLElement>('zoo-input[name="cvv"]') as (HTMLElement & { value: string }) | null;
-      if (cvvInput) cvvInput.value = selected.cvv ?? '';
-
-      const monthSelect = this._root?.querySelector<HTMLSelectElement>('select[name="exp-month"]');
-      const yearSelect = this._root?.querySelector<HTMLSelectElement>('select[name="exp-year"]');
-      if (monthSelect) monthSelect.value = selected.expMonth;
-      if (yearSelect) yearSelect.value = selected.expYear;
-
-      this._syncButtons();
-    };
-
-    this._toggleLoggedOnlyRows(this._isLoggedIn);
-  }
-
-  private _loadStoredCardsForUser(userId: string): StoredCard[] {
-    try {
-      const raw = localStorage.getItem(STORED_CARDS_KEY);
-      if (!raw) return [];
-      const parsed = JSON.parse(raw) as StoredCardsByUser;
-      const cards = parsed[userId];
-      return Array.isArray(cards) ? cards : [];
-    } catch {
-      return [];
-    }
-  }
-
-  private _saveStoredCardsForUser(userId: string, cards: StoredCard[]): void {
-    let parsed: StoredCardsByUser = {};
-
-    try {
-      const raw = localStorage.getItem(STORED_CARDS_KEY);
-      if (raw) parsed = JSON.parse(raw) as StoredCardsByUser;
-    } catch {
-      parsed = {};
-    }
-
-    parsed[userId] = cards;
-    localStorage.setItem(STORED_CARDS_KEY, JSON.stringify(parsed));
-  }
-
   private _validateStep1(): boolean {
     this._clearStepError(1);
 
@@ -790,6 +651,7 @@ export class FeedPopup extends HTMLElement {
 
     if (!this._state.petId) {
       this._setStepError(1, 'Please choose a special pet before continuing.');
+      this._root?.querySelector<HTMLElement>('.feed-popup__dropdown')?.classList.add('feed-popup__dropdown--error');
       return false;
     }
 
@@ -802,16 +664,16 @@ export class FeedPopup extends HTMLElement {
     const nameInput = this._root?.querySelector<HTMLElement>('zoo-input[name="billing-name"]') as (HTMLElement & { value: string }) | null;
     const emailInput = this._root?.querySelector<HTMLElement>('zoo-input[name="billing-email"]') as (HTMLElement & { value: string }) | null;
 
-    const name = nameInput?.value.trim() ?? '';
-    const email = emailInput?.value.trim() ?? '';
+    const name = (nameInput?.value ?? '').trim();
+    const email = (emailInput?.value ?? '').trim();
 
-    const nameRegex = /^[A-Za-z\s]+$/;
+    const nameRegex = /^[A-Za-z\s'-]+$/;
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
     let valid = true;
 
     if (!nameRegex.test(name)) {
-      nameInput?.setAttribute('error', 'Use letters only.');
+      nameInput?.setAttribute('error', 'Use letters, spaces, apostrophes or hyphens only.');
       valid = false;
     }
 
@@ -821,7 +683,7 @@ export class FeedPopup extends HTMLElement {
     }
 
     if (!valid) {
-      this._setStepError(2, 'Please fix the highlighted fields.');
+      this._setStepError(2, 'Please fill in your name and email correctly.');
       return false;
     }
 
@@ -838,8 +700,8 @@ export class FeedPopup extends HTMLElement {
     const monthSelect = this._root?.querySelector<HTMLSelectElement>('select[name="exp-month"]');
     const yearSelect = this._root?.querySelector<HTMLSelectElement>('select[name="exp-year"]');
 
-    const cardRaw = cardInput?.value.trim() ?? '';
-    const cvv = cvvInput?.value.trim() ?? '';
+    const cardRaw = (cardInput?.value ?? '').trim();
+    const cvv = (cvvInput?.value ?? '').trim();
     const expMonth = monthSelect?.value ?? '';
     const expYear = yearSelect?.value ?? '';
 
@@ -873,7 +735,7 @@ export class FeedPopup extends HTMLElement {
     }
 
     if (!valid) {
-      this._setStepError(3, 'Please provide valid card data and future expiration date.');
+      this._setStepError(3, 'Please complete card number, CVV, month and year with valid values.');
       return false;
     }
 
@@ -884,34 +746,11 @@ export class FeedPopup extends HTMLElement {
     return true;
   }
 
-  private _maskCard(cardNumber: string): string {
-    const digits = cardNumber.replace(/\D/g, '');
-    const first4 = digits.slice(0, 4);
-    const last4 = digits.slice(-4);
-    return `${first4} **** **** ${last4}`;
-  }
-
-  private _saveCardIfNeeded(): void {
-    if (!this._isLoggedIn || !this._userId) return;
-
-    const saveChecked = this._root?.querySelector<HTMLInputElement>('#feed-save-card')?.checked ?? false;
-    if (!saveChecked) return;
-
-    const masked = this._maskCard(this._state.cardNumber);
-    const card: StoredCard = {
-      id: `${Date.now()}-${Math.random().toString(16).slice(2)}`,
-      masked,
-      cardNumber: this._state.cardNumber.replace(/\D/g, ''),
-      cvv: this._state.cvv,
-      expMonth: this._state.expMonth,
-      expYear: this._state.expYear,
-    };
-
-    const nextCards = [...this._savedCards, card];
-    this._savedCards = nextCards;
-    this._saveStoredCardsForUser(this._userId, nextCards);
-    this._renderStoredCards();
-    this._toggleLoggedOnlyRows(true);
+  private _extractApiErrorMessage(error: unknown): string {
+    const apiError = error as ApiLikeError | null;
+    if (apiError?.message && apiError.message.trim()) return apiError.message;
+    if (apiError?.error && apiError.error.trim()) return apiError.error;
+    return 'Something went wrong. Please, try again later.';
   }
 
   private async _completeDonation(): Promise<void> {
@@ -927,22 +766,22 @@ export class FeedPopup extends HTMLElement {
     if (completeBtn) completeBtn.disabled = true;
 
     try {
-      await donationsService.createDonation({
+      const response = await donationsService.createDonation({
         amount: this._state.amount,
         petId: this._state.petId,
         name: this._state.name,
         email: this._state.email,
       });
 
-      this._saveCardIfNeeded();
-      const petName = this._pets.find((pet) => pet.id === this._state.petId)?.name ?? 'selected pet';
-      this._showSuccess(`Thank you for your donation of ${this._state.amount} to ${petName}!`);
+      const fallbackPetName = this._pets.find((pet) => pet.id === this._state.petId)?.name ?? 'selected pet';
+      const fallbackMessage = `Thank you for your donation of ${this._state.amount} to ${fallbackPetName}!`;
+      this._showSuccess(response.data.message || fallbackMessage);
 
       window.setTimeout(() => {
         this.close();
       }, 800);
-    } catch {
-      this._setStepError(3, 'Something went wrong. Please, try again later.');
+    } catch (error: unknown) {
+      this._setStepError(3, this._extractApiErrorMessage(error));
     } finally {
       if (completeBtn) completeBtn.disabled = false;
       this._syncButtons();
@@ -958,9 +797,6 @@ export class FeedPopup extends HTMLElement {
 
     this._root.querySelector<HTMLElement>(`[data-step="${step}"]`)?.classList.add('feed-popup__step--active');
     this._step = step;
-
-    if (step === 2) this._applyStep2Values();
-    if (step === 3) this._renderStoredCards();
     this._syncButtons();
   }
 
@@ -993,6 +829,8 @@ export class FeedPopup extends HTMLElement {
       item.classList.remove('feed-popup__dropdown-item--selected');
     });
 
+    this._root.querySelector<HTMLElement>('.feed-popup__dropdown')?.classList.remove('feed-popup__dropdown--open', 'feed-popup__dropdown--error');
+
     this._root.querySelectorAll<HTMLSelectElement>('select').forEach((select) => {
       select.selectedIndex = 0;
       select.classList.remove('feed-popup__select--error');
@@ -1000,9 +838,6 @@ export class FeedPopup extends HTMLElement {
 
     const monthly = this._root.querySelector<HTMLInputElement>('#feed-monthly-gift');
     if (monthly) monthly.checked = false;
-
-    const saveCard = this._root.querySelector<HTMLInputElement>('#feed-save-card');
-    if (saveCard) saveCard.checked = false;
 
     this._syncButtons();
   }
@@ -1029,7 +864,6 @@ export class FeedPopup extends HTMLElement {
     document.addEventListener('keydown', this._onKeydown);
 
     void this._loadPets();
-    this._readProfileAndCards();
     this._goTo(normalized);
     this._syncButtons();
   }
