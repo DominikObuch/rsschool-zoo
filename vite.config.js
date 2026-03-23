@@ -1,5 +1,7 @@
 import { resolve } from 'node:path';
 import { defineConfig } from 'vite';
+import vue from '@vitejs/plugin-vue';
+import { templateCompilerOptions } from '@tresjs/core';
 
 const entries = {
   index: resolve(__dirname, 'index.html'),
@@ -20,6 +22,7 @@ const base = process.env.GITHUB_ACTIONS === 'true' && repoName ? `/${repoName}/`
 
 export default defineConfig({
   base,
+  plugins: [vue(templateCompilerOptions)],
   build: {
     rollupOptions: {
       input: entries,
