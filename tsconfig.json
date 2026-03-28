@@ -11,11 +11,17 @@
     "skipLibCheck": true,
     "allowSyntheticDefaultImports": true,
     "isolatedModules": true,
-    "useDefineForClassFields": true
+    "useDefineForClassFields": true,
+    "baseUrl": ".",
+    "paths": {
+      "@virtual-tour/*": ["components/virtual-tour/*"],
+      "@virtual-tour": ["components/virtual-tour"]
+    }
   },
   "include": [
     "vite.config.ts",
     "components/**/*.ts",
+    "components/**/*.vue",
     "pages/**/*.ts",
     "src/**/*.ts"
   ],

@@ -1,8 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 
 const HomeView = () => import('../views/HomeView.vue')
-
-const VirtualTour = () => import('../../components/virtual-tour/VirtualTour.vue')
+const MainScene = () => import('../../components/virtual-tour/MainScene.vue')
 
 const router = createRouter({
   history: createWebHistory(),
@@ -14,8 +13,16 @@ const router = createRouter({
     },
     {
       path: '/tour',
-      name: 'tour',
-      component: VirtualTour,
+      name: 'main-scene',
+      component: MainScene,
+    },
+    {
+      path: '/pages/virtual-tour',
+      redirect: '/tour',
+    },
+    {
+      path: '/:pathMatch(.*)*',
+      redirect: '/tour',
     },
   ],
 })

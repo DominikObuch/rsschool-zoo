@@ -23,6 +23,11 @@ const base = process.env.GITHUB_ACTIONS === 'true' && repoName ? `/${repoName}/`
 export default defineConfig({
   base,
   plugins: [vue(templateCompilerOptions)],
+  resolve: {
+    alias: {
+      '@virtual-tour': resolve(__dirname, 'components/virtual-tour')
+    }
+  },
   build: {
     rollupOptions: {
       input: entries,
