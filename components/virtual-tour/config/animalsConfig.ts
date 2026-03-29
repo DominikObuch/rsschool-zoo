@@ -5,7 +5,7 @@ export const animalsConfig: { [key in EnumAnimal]: AnimalInfo } = {
     [EnumAnimal.LION]: {
         id: 'lion',
         name: 'Lion',
-        modelPath: '/3dModels/lion.glb',
+        modelPath: '3dModels/lion.glb',
         modelScale: 0.15,
         position: [0, 0.78, 0],
         floorColor: '#DAA520',
@@ -15,7 +15,7 @@ export const animalsConfig: { [key in EnumAnimal]: AnimalInfo } = {
     [EnumAnimal.PENGUIN]: {
         id: 'penguin',
         name: 'Penguin',
-        modelPath: '/3dModels/penguin.glb',
+        modelPath: '3dModels/penguin.glb',
         modelScale: 0.005,
         position: [0, 0, 0],
         floorColor: '#F0F8FF',
@@ -25,7 +25,7 @@ export const animalsConfig: { [key in EnumAnimal]: AnimalInfo } = {
     [EnumAnimal.ELEPHANT]: {
         id: 'elephant',
         name: 'Elephant',
-        modelPath: '/3dModels/elephant.glb',
+        modelPath: '3dModels/elephant.glb',
         modelScale: 0.39,
         position: [0, 0, 0],
         floorColor: '#8B5A2B',
@@ -35,7 +35,7 @@ export const animalsConfig: { [key in EnumAnimal]: AnimalInfo } = {
     [EnumAnimal.PANDA]: {
         id: 'panda',
         name: 'Panda',
-        modelPath: '/3dModels/panda.glb',
+        modelPath: '3dModels/panda.glb',
         modelScale: 1,
         position: [0, 0, 0],
         floorColor: '#32CD32',

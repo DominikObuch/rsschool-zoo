@@ -1,4 +1,4 @@
-import { createRouter, createWebHistory } from 'vue-router'
+import { createRouter, createWebHashHistory } from 'vue-router'
 
 const MainScene = () => import('../../components/virtual-tour/MainScene.vue')
 const CreditsView = () => import('../views/CreditsView.vue')
@@ -14,7 +14,7 @@ const LandingRedirectView = {
 }
 
 const router = createRouter({
-  history: createWebHistory(import.meta.env.BASE_URL),
+  history: createWebHashHistory(import.meta.env.BASE_URL),
   routes: [
     {
       path: '/',

@@ -20,8 +20,8 @@ const props = defineProps<{
             </TresMesh>
          <Suspense>
              <GLTFModel
-             path="/3dModels/terrain/tree_savanna.glb"
-             :position=" [3, 0, 2]"
+             path="3dModels/terrain/tree_savanna.glb"
+             :position=" [0/4, 0, 2]"
              :scale="0.48"
              cast-shadow
              receive-shadow />

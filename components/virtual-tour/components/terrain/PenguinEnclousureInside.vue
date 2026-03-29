@@ -33,7 +33,7 @@ const props = defineProps<{
             </TresMesh>
          <Suspense>
              <GLTFModel
-             path="/3dModels/terrain/iceberg_scene.glb"
+             path="3dModels/terrain/iceberg_scene.glb"
              :position="props.position || [0, 0, 0]"
              :scale="0.78"
              cast-shadow

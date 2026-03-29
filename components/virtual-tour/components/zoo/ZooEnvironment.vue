@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { onBeforeUnmount, shallowRef } from 'vue';
 import zooConfig from '@virtual-tour/config/zooConfig';
 import { Mesh, MeshStandardMaterial, RepeatWrapping, SRGBColorSpace, Texture, type Object3D } from 'three';
 import Solid from '@virtual-tour/components/utility/Solid.vue';
+import { loadCachedGltfModel, VIRTUAL_TOUR_TEXTURE_MODEL_PATHS } from '@virtual-tour/states/useCachedGltfLoader';
 import ZooWallSign from '@virtual-tour/components/zoo/ZooWallSign.vue';
 
 type WallConfig = {
@@ -21,7 +21,8 @@ type WallTextures = {
     metalnessMap: Texture | null
 }
 
-const WALL_TEXTURE_MODEL_PATH = '/3dModels/texture/red_bricks_wall.glb'
+type WallTextureMap = Record<string, WallTextures>
+
 const BRICK_TILE_WORLD_SIZE = 2.2
 
 const walls: WallConfig[] = [
@@ -55,14 +56,20 @@ const walls: WallConfig[] = [
     },
 ]
 
-const wallTextures = shallowRef<WallTextures[]>(
-    walls.map(() => ({
+function createEmptyWallTextures(): WallTextures {
+    return {
         map: null,
         normalMap: null,
         roughnessMap: null,
         metalnessMap: null,
-    })),
-)
+    }
+}
+
+function createInitialWallTextureMap(): WallTextureMap {
+    return Object.fromEntries(walls.map((wall) => [wall.key, createEmptyWallTextures()])) as WallTextureMap
+}
+
+const wallTextures = shallowRef<WallTextureMap>(createInitialWallTextureMap())
 
 function cloneTexture(source: Texture | null, repeatX: number, repeatY: number, asColorTexture = false): Texture | null {
     if (!source) return null
@@ -79,29 +86,44 @@ function cloneTexture(source: Texture | null, repeatX: number, repeatY: number, 
     return texture
 }
 
-function buildWallTextures(material: MeshStandardMaterial): WallTextures[] {
-    return walls.map((wall) => {
-        const repeatX = Math.max(wall.width / BRICK_TILE_WORLD_SIZE, 1)
-        const repeatY = Math.max(wall.height / BRICK_TILE_WORLD_SIZE, 1)
+function buildWallTextures(material: MeshStandardMaterial | null): WallTextureMap {
+    if (!material) {
+        return createInitialWallTextureMap()
+    }
 
-        return {
-            map: cloneTexture(material.map ?? null, repeatX, repeatY, true),
-            normalMap: cloneTexture(material.normalMap ?? null, repeatX, repeatY),
-            roughnessMap: cloneTexture(material.roughnessMap ?? null, repeatX, repeatY),
-            metalnessMap: cloneTexture(material.metalnessMap ?? null, repeatX, repeatY),
-        }
-    })
+    return Object.fromEntries(
+        walls.map((wall) => {
+            const repeatX = Math.max(wall.width / BRICK_TILE_WORLD_SIZE, 1)
+            const repeatY = Math.max(wall.height / BRICK_TILE_WORLD_SIZE, 1)
+
+            return [
+                wall.key,
+                {
+                    map: cloneTexture(material.map ?? null, repeatX, repeatY, true),
+                    normalMap: cloneTexture(material.normalMap ?? null, repeatX, repeatY),
+                    roughnessMap: cloneTexture(material.roughnessMap ?? null, repeatX, repeatY),
+                    metalnessMap: cloneTexture(material.metalnessMap ?? null, repeatX, repeatY),
+                },
+            ]
+        }),
+    ) as WallTextureMap
 }
 
 function getSourceMaterial(scene: Object3D): MeshStandardMaterial | null {
     let material: MeshStandardMaterial | null = null
 
     scene.traverse((child) => {
+        if (material) {
+            return
+        }
+
         const mesh = child as Mesh
-        if (!mesh.isMesh) return
+        if (!mesh.isMesh) {
+            return
+        }
 
         const materialCandidate = Array.isArray(mesh.material) ? mesh.material[0] : mesh.material
-        if (!material && materialCandidate && (materialCandidate as MeshStandardMaterial).isMeshStandardMaterial) {
+        if (materialCandidate && (materialCandidate as MeshStandardMaterial).isMeshStandardMaterial) {
             material = materialCandidate as MeshStandardMaterial
         }
     })
@@ -110,13 +132,13 @@ function getSourceMaterial(scene: Object3D): MeshStandardMaterial | null {
 }
 
 async function loadWallTextures() {
-    const loader = new GLTFLoader()
-
     try {
-        const gltf = await loader.loadAsync(WALL_TEXTURE_MODEL_PATH)
+        const gltf = await loadCachedGltfModel(VIRTUAL_TOUR_TEXTURE_MODEL_PATHS.wall)
         const sourceMaterial = getSourceMaterial(gltf.scene)
 
-        if (!sourceMaterial) return
+        if (!sourceMaterial) {
+            console.error('Wall texture source material was not found in the model.')
+        }
 
         wallTextures.value = buildWallTextures(sourceMaterial)
     } catch (error) {
@@ -127,7 +149,7 @@ async function loadWallTextures() {
 void loadWallTextures()
 
 onBeforeUnmount(() => {
-    wallTextures.value.forEach((textures) => {
+    Object.values(wallTextures.value).forEach((textures) => {
         textures.map?.dispose()
         textures.normalMap?.dispose()
         textures.roughnessMap?.dispose()
@@ -139,23 +161,20 @@ onBeforeUnmount(() => {
 
         <Solid>
             <TresMesh
-                v-for="(wall, index) in walls"
+                v-for="wall in walls"
                 :key="wall.key"
                 :position="wall.position"
                 :rotation="wall.rotation"
             >
                 <TresPlaneGeometry :args="[wall.width, wall.height]" />
-                <TresMeshPhysicalMaterial
+                <TresMeshStandardMaterial
                     color="#ffffff"
-                    :map="wallTextures[index]?.map || null"
-                    :normalMap="wallTextures[index]?.normalMap || null"
-                    :roughnessMap="wallTextures[index]?.roughnessMap || null"
-                    :metalnessMap="wallTextures[index]?.metalnessMap || null"
+                    :map="wallTextures[wall.key]?.map || null"
+                    :normalMap="wallTextures[wall.key]?.normalMap || null"
+                    :roughnessMap="wallTextures[wall.key]?.roughnessMap || null"
+                    :metalnessMap="wallTextures[wall.key]?.metalnessMap || null"
                 />
             </TresMesh>
         </Solid>
-        <ZooWallSign />
-        <!-- HELPERS -->
-        <TresAxesHelper />
-        <TresGridHelper />
+            <ZooWallSign />
 </template>

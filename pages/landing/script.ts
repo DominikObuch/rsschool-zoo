@@ -92,7 +92,7 @@ document.addEventListener('DOMContentLoaded', () => {
   if (virtualTourLink) {
     const basePath = import.meta.env.BASE_URL ?? '/';
     const normalizedBasePath = basePath.endsWith('/') ? basePath : `${basePath}/`;
-    virtualTourLink.href = `${normalizedBasePath}tour`;
+    virtualTourLink.href = `${normalizedBasePath}#/tour`;
   }
 
   void initLandingData();

@@ -1,8 +1,12 @@
 <script setup lang="ts">
-import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { onBeforeUnmount, shallowRef } from 'vue';
-import { DoubleSide, Mesh, MeshStandardMaterial, RepeatWrapping, SRGBColorSpace, Texture } from 'three';
+import { DoubleSide, RepeatWrapping, SRGBColorSpace, Texture } from 'three';
 import zooConfig from '@virtual-tour/config/zooConfig';
+import {
+  extractFirstMeshStandardMaterial,
+  loadCachedGltfModel,
+  VIRTUAL_TOUR_TEXTURE_MODEL_PATHS,
+} from '@virtual-tour/states/useCachedGltfLoader';
 
 type GroundTile = {
   position: [number, number, number]
@@ -17,7 +21,6 @@ type TileTextures = {
   metalnessMap: Texture | null
 }
 
-const PAVING_MODEL_PATH = '/3dModels/texture/seamless_paving_stone_texture.glb'
 const TEXTURE_TILE_WORLD_SIZE = 2.2
 const GROUND_Y = -0.02
 const GROUND_ROTATION: [number, number, number] = [Math.PI / 2, 0, 0]
@@ -97,34 +100,28 @@ function cloneTexture(source: Texture | null, repeatX: number, repeatY: number, 
 }
 
 async function loadPavingTextures() {
-  const loader = new GLTFLoader()
-  const gltf = await loader.loadAsync(PAVING_MODEL_PATH)
+  try {
+    const gltf = await loadCachedGltfModel(VIRTUAL_TOUR_TEXTURE_MODEL_PATHS.paving)
+    const sourceMaterial = extractFirstMeshStandardMaterial(gltf.scene)
 
-  let sourceMaterial: MeshStandardMaterial | null = null
-
-  gltf.scene.traverse((child) => {
-    const mesh = child as Mesh
-    if (!mesh.isMesh) return
-
-    const materialCandidate = Array.isArray(mesh.material) ? mesh.material[0] : mesh.material
-    if (materialCandidate && (materialCandidate as MeshStandardMaterial).isMeshStandardMaterial) {
-      sourceMaterial = materialCandidate as MeshStandardMaterial
+    if (!sourceMaterial) {
+      throw new Error('Paving texture source material was not found in the model.')
     }
-  })
 
-  if (!sourceMaterial) return
+    tileTextures.value = tiles.map((tile) => {
+      const repeatX = Math.max(tile.width / TEXTURE_TILE_WORLD_SIZE, 1)
+      const repeatY = Math.max(tile.depth / TEXTURE_TILE_WORLD_SIZE, 1)
 
-  tileTextures.value = tiles.map((tile) => {
-    const repeatX = Math.max(tile.width / TEXTURE_TILE_WORLD_SIZE, 1)
-    const repeatY = Math.max(tile.depth / TEXTURE_TILE_WORLD_SIZE, 1)
-
-    return {
-      map: cloneTexture(sourceMaterial?.map ?? null, repeatX, repeatY, true),
-      normalMap: cloneTexture(sourceMaterial?.normalMap ?? null, repeatX, repeatY),
-      roughnessMap: cloneTexture(sourceMaterial?.roughnessMap ?? null, repeatX, repeatY),
-      metalnessMap: cloneTexture(sourceMaterial?.metalnessMap ?? null, repeatX, repeatY),
-    }
-  })
+      return {
+        map: cloneTexture(sourceMaterial.map ?? null, repeatX, repeatY, true),
+        normalMap: cloneTexture(sourceMaterial.normalMap ?? null, repeatX, repeatY),
+        roughnessMap: cloneTexture(sourceMaterial.roughnessMap ?? null, repeatX, repeatY),
+        metalnessMap: cloneTexture(sourceMaterial.metalnessMap ?? null, repeatX, repeatY),
+      }
+    })
+  } catch (error) {
+    console.error('Failed to load paving textures', error)
+  }
 }
 
 void loadPavingTextures()
