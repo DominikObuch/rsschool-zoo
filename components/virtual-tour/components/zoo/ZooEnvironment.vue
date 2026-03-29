@@ -1,24 +1,11 @@
 <script setup lang="ts">
 import zooConfig from '@virtual-tour/config/zooConfig';
 import FpsScene from '@virtual-tour/components/FpsScene.vue';
-import { PointerLockControls } from '@tresjs/cientos';
-import { PCFShadowMap } from 'three';
 import { FrontSide, BackSide } from 'three';
 import Solid from '@virtual-tour/components/utility/Solid.vue';
 </script>
 <template>
-    <TresCanvas
-    clear-color="#87ceeb"
-    shadows
-    :shadow-map-type="PCFShadowMap"
-    :dpr="[1, 1.5]">
-    <FpsScene />
-    <TresAmbientLight :intensity="0.65" />
-    <TresDirectionalLight
-    :position="[8, 12, 6]"
-    :intensity="1.05"
-    cast-shadow/>
-        <PointerLockControls  />
+
 
         <!-- Ground -->
         <TresMesh :position="[0, 0, 0]" :rotation="[-Math.PI/2,0, 0]" receive-shadow>
@@ -50,5 +37,4 @@ import Solid from '@virtual-tour/components/utility/Solid.vue';
         <!-- HELPERS -->
         <TresAxesHelper />
         <TresGridHelper />
-    </TresCanvas>
 </template>
