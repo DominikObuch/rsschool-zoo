@@ -12,6 +12,9 @@ import AnimalEnclosure from './components/terrain/AnimalEnclosure.vue';
 import PenguinEnclousureInside from './components/terrain/PenguinEnclousureInside.vue';
 import LionEnclousureInside from './components/terrain/LionEnclousureInside.vue';
 import zooConfig from './config/zooConfig';
+import PandaEnclousureInside from './components/terrain/PandaEnclousureInside.vue';
+import ElephantEnclousureInside from './components/terrain/ElephantEnclousureInside.vue';
+import ZooGround from './components/zoo/ZooGround.vue';
 
 </script>
 
@@ -27,10 +30,13 @@ import zooConfig from './config/zooConfig';
           <PointerLockControls  />
           <Lights />
           <ZooEnvironment />
+          <ZooGround />
           <AnimalEnclosure :position="zooConfig.pandaEnclousurePosition" >
+            <PandaEnclousureInside :position="[0, 0, 0]" :rotation="[0, 0, 0]"/>
             <Animal :rotation="[0, Math.PI, 0]" :animal="animalsConfig[EnumAnimal.PANDA]"></Animal>
           </AnimalEnclosure>
           <AnimalEnclosure :position="zooConfig.elephantEnclousurePosition" >
+            <ElephantEnclousureInside :position="[0, 0, 0]" :rotation="[0, Math.PI, 0]"/>
             <Animal :rotation="[0, Math.PI, 0]" :animal="animalsConfig[EnumAnimal.ELEPHANT]"></Animal>
           </AnimalEnclosure>
           <AnimalEnclosure :position="zooConfig.lionEnclousurePosition" >
