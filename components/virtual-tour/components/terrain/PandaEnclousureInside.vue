@@ -16,7 +16,7 @@ const props = defineProps<{
          <!-- GROUND-->
             <TresMesh :position="[0, 0, 0]" :rotation="[Math.PI / 2, 0, 0]">
                 <TresPlaneGeometry :args="[zooConfig.enclousureSize, zooConfig.enclousureSize]" />
-                <TresMeshStandardMaterial color="#FDEBC0" :side="DoubleSide" />
+                <TresMeshStandardMaterial color="#55a536" :side="DoubleSide" />
             </TresMesh>
          <Suspense>
              <TresGroup>
