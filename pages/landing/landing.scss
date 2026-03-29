@@ -41,6 +41,13 @@
     margin: 0 0 2rem;
   }
 
+  &__actions {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
+
   &__cta {
     display: inline-flex;
     align-items: center;
@@ -63,6 +70,16 @@
 
     &:hover {
       background-color: $color-orange-dark;
+    }
+  }
+
+  &__cta--tour {
+    padding: 18px 34px;
+    font-size: 1rem;
+    background-color: $color-turquoise;
+
+    &:hover {
+      background-color: $color-turquoise-dark;
     }
   }
 
@@ -105,6 +122,10 @@
 
     &__subtitle {
       max-width: 100%;
+    }
+
+    &__actions {
+      width: 100%;
     }
 
     &__cta {

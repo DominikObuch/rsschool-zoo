@@ -59,15 +59,28 @@ import ZooGround from './components/zoo/ZooGround.vue';
 <style scoped>
 .virtual-tour {
   width: 100%;
+  min-height: calc(100dvh - var(--app-header-height, 74px) - 1rem);
 }
 
 .virtual-tour__canvas-wrap {
   width: 100%;
-  height: calc(100vh - 150px);
+  height: calc(100dvh - var(--app-header-height, 74px) - 1rem);
   min-height: 520px;
-  border-radius: 16px;
+  border-radius: 12px;
   overflow: hidden;
   background: #d7e6f5;
+}
+
+@media (max-width: 640px) {
+  .virtual-tour {
+    min-height: calc(100dvh - var(--app-header-height, 74px) - 0.5rem);
+  }
+
+  .virtual-tour__canvas-wrap {
+    height: calc(100dvh - var(--app-header-height, 74px) - 0.5rem);
+    min-height: 420px;
+    border-radius: 8px;
+  }
 }
 
 </style>
