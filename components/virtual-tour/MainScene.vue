@@ -1,12 +1,14 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, onMounted, onUnmounted, ref } from 'vue'
-import { DoubleSide, PCFShadowMap, Vector3 } from 'three'
+import { BackSide, DoubleSide, FrontSide, PCFShadowMap, Vector3 } from 'three'
 import { shallowRef } from 'vue'
 import { useDebounceFn } from '@vueuse/core'
 import FpsScene from './components/FpsScene.vue'
 import { PointerLockControls } from '@tresjs/cientos'
 import playerConfig from './config/playerConfig'
 import { useLoop } from '@tresjs/core'
+import zooConfig from './config/zooConfig'
+import ZooEnvironment from './components/zoo/ZooEnvironment.vue'
 
 
 type Vec3 = [number, number, number]
@@ -65,33 +67,7 @@ type TresControlsLike = {
 <template>
   <section class="virtual-tour" aria-label="3D virtual tour">
     <div class="virtual-tour__canvas-wrap">
-      <TresCanvas
-        clear-color="#87ceeb"
-        shadows
-        :shadow-map-type="PCFShadowMap"
-        :dpr="[1, 1.5]">
-        <FpsScene />
-        <TresAmbientLight :intensity="0.65" />
-        <TresDirectionalLight
-          :position="[8, 12, 6]"
-          :intensity="1.05"
-          cast-shadow/>
-          <PointerLockControls  />
-
-        <!-- Ground -->
-        <TresMesh :position="[0, -0.2, 0]" receive-shadow>
-          <TresCylinderGeometry :args="[20, 20, 0.4, 96]" />
-          <TresMeshStandardMaterial color="#9ea3a8" />
-        </TresMesh>
-        <!-- MAIN WALL-->
-        <TresMesh :position="[0, 3, 0]">
-          <TresCylinderGeometry :args="[21, 21, 6, 128, 1, true]" />
-          <TresMeshStandardMaterial color="#787d82" :side="DoubleSide" />
-        </TresMesh>
-        <!-- HELPERS -->
-        <TresAxesHelper />
-        <TresGridHelper />
-      </TresCanvas>
+      <ZooEnvironment />
     </div>
   </section>
 </template>
