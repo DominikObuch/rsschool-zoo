@@ -1,8 +1,12 @@
 <script setup lang="ts">
 import Fense from './Fense.vue';
+
+const props = defineProps<{
+  position: [number, number, number]
+}>()
 </script>
 <template>
-    <TresGroup >
+    <TresGroup :position="position">
         <!-- RIGHT WALL-->
         <Fense :position="[4.5, 0, 0]" :rotation="[0, Math.PI /2 , 0]" />
         <Fense :position="[4.5, 0, 3]" :rotation="[0, Math.PI /2 , 0]" />
@@ -12,7 +16,7 @@ import Fense from './Fense.vue';
         <Fense :position="[-4.5, 0, 3]" :rotation="[0, Math.PI / 2, 0]"  />
         <Fense :position="[-4.5, 0, -3]" :rotation="[0, Math.PI / 2, 0]"  />
         <Fense :position="[-4.5, 0, 0]" :rotation="[0, Math.PI / 2, 0]"  />
-        
+
         <slot/>
 
         <!-- BACK WALL-->

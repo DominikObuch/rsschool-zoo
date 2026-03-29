@@ -6,12 +6,6 @@ import Solid from '@virtual-tour/components/utility/Solid.vue';
 </script>
 <template>
 
-
-        <!-- Ground -->
-        <TresMesh :position="[0, 0, 0]" :rotation="[-Math.PI/2,0, 0]" receive-shadow>
-            <TresPlaneGeometry :args="[zooConfig.width, zooConfig.depth]"  />
-            <TresMeshStandardMaterial color="#9ea3a8" />
-        </TresMesh>
         <Solid>
             <!-- BEHIND WALL-->
             <TresMesh :position="[0, 0,zooConfig.depth/2]" :rotation="[Math.PI, 0,0]">

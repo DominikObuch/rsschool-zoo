@@ -9,6 +9,9 @@ import Animal from './components/Animal.vue';
 import { PointerLockControls } from '@tresjs/cientos';
 import Fense from './components/terrain/Fense.vue';
 import AnimalEnclosure from './components/terrain/AnimalEnclosure.vue';
+import PenguinEnclousureInside from './components/terrain/PenguinEnclousureInside.vue';
+import LionEnclousureInside from './components/terrain/LionEnclousureInside.vue';
+import zooConfig from './config/zooConfig';
 
 </script>
 
@@ -24,8 +27,23 @@ import AnimalEnclosure from './components/terrain/AnimalEnclosure.vue';
           <PointerLockControls  />
           <Lights />
           <ZooEnvironment />
-          <AnimalEnclosure />
-          <!-- <Animal :animal="animalsConfig[EnumAnimal.PANDA]"></Animal> -->
+          <AnimalEnclosure :position="zooConfig.pandaEnclousurePosition" >
+            <Animal :rotation="[0, Math.PI, 0]" :animal="animalsConfig[EnumAnimal.PANDA]"></Animal>
+          </AnimalEnclosure>
+          <AnimalEnclosure :position="zooConfig.elephantEnclousurePosition" >
+            <Animal :rotation="[0, Math.PI, 0]" :animal="animalsConfig[EnumAnimal.ELEPHANT]"></Animal>
+          </AnimalEnclosure>
+          <AnimalEnclosure :position="zooConfig.lionEnclousurePosition" >
+            <LionEnclousureInside :position="[0, 0, 0]" :rotation="[0, Math.PI, 0]"/>
+            <Animal :rotation="[0, Math.PI, 0]" :animal="animalsConfig[EnumAnimal.LION]"></Animal>
+          </AnimalEnclosure>
+          <AnimalEnclosure :position="zooConfig.penguinEnclousurePosition" >
+            <PenguinEnclousureInside :position="[0, 0, 0]" :rotation="[0, Math.PI, 0]"/>
+            <Animal :position="[0.2, 0.24, 0.2]" :animal="animalsConfig[EnumAnimal.PENGUIN]"/>
+            <Animal :position="[0.3, 0.24, 0.4]" :animal="animalsConfig[EnumAnimal.PENGUIN]"/>
+            <Animal :position="[0.5, 0.24, 0.5]" :animal="animalsConfig[EnumAnimal.PENGUIN]"/>
+            <Animal :position="[0.2, 0.24, 0.6]" :animal="animalsConfig[EnumAnimal.PENGUIN]"/>
+          </AnimalEnclosure>
         </TresCanvas>
 
     </div>
