@@ -4,6 +4,7 @@ import { onBeforeUnmount, shallowRef } from 'vue';
 import zooConfig from '@virtual-tour/config/zooConfig';
 import { Mesh, MeshStandardMaterial, RepeatWrapping, SRGBColorSpace, Texture, type Object3D } from 'three';
 import Solid from '@virtual-tour/components/utility/Solid.vue';
+import ZooWallSign from '@virtual-tour/components/zoo/ZooWallSign.vue';
 
 type WallConfig = {
     key: string
@@ -153,6 +154,7 @@ onBeforeUnmount(() => {
                 />
             </TresMesh>
         </Solid>
+        <ZooWallSign />
         <!-- HELPERS -->
         <TresAxesHelper />
         <TresGridHelper />
