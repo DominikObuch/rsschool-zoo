@@ -88,6 +88,13 @@ async function initLandingData(): Promise<void> {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+  const virtualTourLink = document.querySelector<HTMLAnchorElement>('[data-virtual-tour-link]');
+  if (virtualTourLink) {
+    const basePath = import.meta.env.BASE_URL ?? '/';
+    const normalizedBasePath = basePath.endsWith('/') ? basePath : `${basePath}/`;
+    virtualTourLink.href = `${normalizedBasePath}#/tour`;
+  }
+
   void initLandingData();
 
   const submitBtn = document.querySelector<HTMLButtonElement>('.donation__submit');
